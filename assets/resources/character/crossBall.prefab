@@ -1,0 +1,79 @@
+[
+  {
+    "__type__": "cc.Prefab",
+    "_name": "crossBall",
+    "data": {
+      "__id__": 1
+    }
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "crossBall",
+    "_components": [
+      {
+        "__type__": "cc.Sprite",
+        "node": {
+          "__id__": 1
+        },
+        "_spriteFrame": {
+          "__uuid__": "a08ff10e-136d-4fe8-9654-a0dcbb2fb661"
+        },
+        "_type": 1,
+        "_sizeMode": 0
+      },
+      {
+        "__type__": "cc.RigidBody",
+        "node": {
+          "__id__": 1
+        },
+        "enabledContactListener": true
+      },
+      {
+        "__type__": "fcffbre2W5Kz58mIfA72AdH",
+        "node": {
+          "__id__": 1
+        }
+      },
+      {
+        "__type__": "cc.PhysicsCircleCollider",
+        "node": {
+          "__id__": 1
+        },
+        "_radius": 80
+      }
+    ],
+    "_prefab": {
+      "__type__": "cc.PrefabInfo",
+      "root": {
+        "__id__": 1
+      },
+      "asset": {
+        "__uuid__": "e1b975b0-fea6-4c57-95aa-df1859382acf"
+      },
+      "fileId": "5bsi6k+21DwqCOB+YLKUQO"
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 160,
+      "height": 160
+    },
+    "_trs": {
+      "__type__": "TypedArray",
+      "ctor": "Float64Array",
+      "array": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "_groupIndex": 7,
+    "groupIndex": 7
+  }
+]

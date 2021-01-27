@@ -1,0 +1,89 @@
+[
+  {
+    "__type__": "cc.Prefab",
+    "_name": "switch",
+    "data": {
+      "__id__": 1
+    }
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "switch",
+    "_components": [
+      {
+        "__type__": "cc.Sprite",
+        "node": {
+          "__id__": 1
+        },
+        "_spriteFrame": {
+          "__uuid__": "46181e27-297d-4182-a6bf-ae80be71906f"
+        },
+        "_type": 1
+      },
+      {
+        "__type__": "cc.RigidBody",
+        "node": {
+          "__id__": 1
+        },
+        "_type": 0,
+        "enabledContactListener": true
+      },
+      {
+        "__type__": "cc.PhysicsBoxCollider",
+        "node": {
+          "__id__": 1
+        },
+        "_density": 0,
+        "_friction": 0,
+        "_size": {
+          "__type__": "cc.Size",
+          "width": 88,
+          "height": 36
+        }
+      },
+      {
+        "__type__": "1c411JC1bhFP4pXKBIpeLlX",
+        "node": {
+          "__id__": 1
+        }
+      }
+    ],
+    "_prefab": {
+      "__type__": "cc.PrefabInfo",
+      "root": {
+        "__id__": 1
+      },
+      "asset": {
+        "__uuid__": "2579e329-4019-41ac-82ca-b1a12047658e"
+      },
+      "fileId": "5bsi6k+21DwqCOB+YLKUQO"
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 88,
+      "height": 36
+    },
+    "_anchorPoint": {
+      "__type__": "cc.Vec2",
+      "x": 0.5
+    },
+    "_trs": {
+      "__type__": "TypedArray",
+      "ctor": "Float64Array",
+      "array": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "_groupIndex": 8,
+    "groupIndex": 8
+  }
+]

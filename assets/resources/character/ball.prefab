@@ -1,0 +1,79 @@
+[
+  {
+    "__type__": "cc.Prefab",
+    "_name": "ball",
+    "data": {
+      "__id__": 1
+    }
+  },
+  {
+    "__type__": "cc.Node",
+    "_name": "ball",
+    "_components": [
+      {
+        "__type__": "cc.Sprite",
+        "node": {
+          "__id__": 1
+        },
+        "_spriteFrame": {
+          "__uuid__": "b0c28fca-d07a-437e-a1f2-252cd660a7e1"
+        },
+        "_type": 1,
+        "_sizeMode": 0
+      },
+      {
+        "__type__": "cc.RigidBody",
+        "node": {
+          "__id__": 1
+        },
+        "enabledContactListener": true
+      },
+      {
+        "__type__": "fcffbre2W5Kz58mIfA72AdH",
+        "node": {
+          "__id__": 1
+        }
+      },
+      {
+        "__type__": "cc.PhysicsCircleCollider",
+        "node": {
+          "__id__": 1
+        },
+        "_radius": 80
+      }
+    ],
+    "_prefab": {
+      "__type__": "cc.PrefabInfo",
+      "root": {
+        "__id__": 1
+      },
+      "asset": {
+        "__uuid__": "a6c62872-a2c1-49ec-a633-06a8f567b91d"
+      },
+      "fileId": "5bsi6k+21DwqCOB+YLKUQO"
+    },
+    "_contentSize": {
+      "__type__": "cc.Size",
+      "width": 160,
+      "height": 160
+    },
+    "_trs": {
+      "__type__": "TypedArray",
+      "ctor": "Float64Array",
+      "array": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    "_groupIndex": 6,
+    "groupIndex": 6
+  }
+]
