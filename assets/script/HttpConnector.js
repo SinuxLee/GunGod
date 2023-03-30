@@ -1,7 +1,8 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
+
 cc.Class({
   extends: cc.Component,
-  properties: {},
+
   onLoad: function () {
     this.node.WxRegister = this.node.checkName + '/checkCode'
     this.node.WxServerDelivery = 'weixin/shopBuy'
@@ -34,14 +35,18 @@ cc.Class({
   start: function () {},
   dealResponseAb: function (e) {},
   dealResponseJson: function (e) {
-    console.log('dealResponseJson:', e), cc.systemEvent.emit(i.GOT_HTTP_RES, e)
+    console.log('dealResponseJson:', e)
+    cc.systemEvent.emit(ModuleEventEnum.GOT_HTTP_RES, e)
   },
   refineReport: function (e) {},
   appLinkReport: function (e) {
     if (facade.isMiniGame) {
-      this.reqData = null, this.reqData = window.facade.getComponent('PlayerModel').wxAdaptor.getAppLinkParams(), this.reqData.objGmId = e
+      this.reqData = null
+      this.reqData = window.facade.getComponent('PlayerModel').wxAdaptor.getAppLinkParams()
+      this.reqData.objGmId = e
       const t = Date.parse(new Date())
-      this.reqData.timeStr = t / 1e3, console.log('====behaveReport:', this.reqData)
+      this.reqData.timeStr = t / 1e3
+      console.log('====behaveReport:', this.reqData)
       const n = {
         gmId: this.reqData.gmId,
         objGmId: this.reqData.objGmId,
@@ -55,7 +60,7 @@ cc.Class({
       let o = 0
       for (const a in this.reqData) o > 0 && (i += '&'), o++, i += a + '=' + this.reqData[a]
       const s = window.facade.appLinkReportAdress
-      this.requestUrl(s, i, !0)
+      this.requestUrl(s, i, true)
     }
   },
   behaveReport: function (e) {},
@@ -71,7 +76,7 @@ cc.Class({
     let n = ''
     let i = 0
     for (const o in t) i > 0 && (n += '&'), i++, n += o + '=' + t[o]
-    this.requestUrl(e, n, !0)
+    this.requestUrl(e, n, true)
   },
   urlencode: function (e) {
     let t = encodeURIComponent(e)
@@ -89,14 +94,15 @@ cc.Class({
     let a = i.join('&')
     const s = ['GET', this.urlencode(e), this.urlencode(i.join('&'))].join('&')
     const c = CryptoJS.HmacSHA1(s, window.facade.qqAppKey + '&').toString(CryptoJS.enc.Base64)
-    a += '&sig=' + this.urlencode(c), this.requestUrl(n, a, !1)
+    a += '&sig=' + this.urlencode(c), this.requestUrl(n, a, false)
   },
   requestUrl: function (e, t, n, i, o) {
     if (e != null && e != '') {
       let a
       a = t && !n ? e + '?' + t : e
       const s = new XMLHttpRequest()
-      console.log('requestUrl', e), n ? (s.open('POST', e, !0), s.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')) : s.open('GET', a, !0), s.onerror = function () {
+      console.log('requestUrl', e)
+      n ? (s.open('POST', e, true), s.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')) : s.open('GET', a, true), s.onerror = function () {
         i != null && s.readyState == 1 && s.status
       }, s.onreadystatechange = function () {
         s.readyState == 4 && (s.status == 200 ? o == 'arraybuffer' ? (s.responseType = o, this.dealResponseAb(s.response)) : this.dealResponseJson(JSON.parse(s.responseText)) : i && i(s.status))
@@ -106,6 +112,7 @@ cc.Class({
   getParamString: function (e) {
     let t = ''
     for (const n in e) t += '{0}={1}&'.format(n, e[n])
-    return console.log('params---------\x3e', t), t.substr(0, t.length - 1)
+    console.log('params---------\x3e', t)
+    return t.substr(0, t.length - 1)
   }
 })

@@ -4,13 +4,14 @@ function o (e, t, n) {
   return t in e
     ? Object.defineProperty(e, t, {
       value: n,
-      enumerable: !0,
-      configurable: !0,
-      writable: !0
+      enumerable: true,
+      configurable: true,
+      writable: true
     })
     : e[t] = n, e
 }
-const a = require('MoreGameManager')
+const MoreGameManager = require('MoreGameManager')
+
 cc.Class((o(i = {
   extends: cc.Component,
   properties: {
@@ -21,8 +22,9 @@ cc.Class((o(i = {
   },
   initData: function () {
     const e = this
-    a.requestMoreGameList(function (t) {
-      e.boxList = t, e.showMoreGameList()
+    MoreGameManager.requestMoreGameList(function (t) {
+      e.boxList = t
+      e.showMoreGameList()
     })
   },
   onLoad: function () {
@@ -30,19 +32,24 @@ cc.Class((o(i = {
   },
   onDisable: function () {},
   onEnable: function () {
-    this.node.active = !0
+    this.node.active = true
   }
 }, 'onDisable', function () {
-  this.node.active = !1
-}), o(i, 'showMoreGameList', function () {
-  this.listNode.active = !0
+  this.node.active = false
+}),
+o(i, 'showMoreGameList', function () {
+  this.listNode.active = true
   this.node.width
   for (let e = 0; e < this.boxList.length; e++) {
     const t = cc.instantiate(this.itemNode)
-    t.active = !0, t.getComponent('MoreGameItemOne').setupItemData(this.boxList[e]), this.scrollView.addChild(t)
+    t.active = true
+    t.getComponent('MoreGameItemOne').setupItemData(this.boxList[e])
+    this.scrollView.addChild(t)
   }
-}), o(i, 'closeHandler', function () {
-  this.node.active = !1
-}), o(i, 'openHandler', function () {
+}),
+o(i, 'closeHandler', function () {
+  this.node.active = false
+}),
+o(i, 'openHandler', function () {
   this.node.active = !this.node.active
 }), i))

@@ -12,18 +12,33 @@ cc.Class({
     cc.systemEvent.on(t.INVITE_UPDATE_DAILY, this.updateShow, this)
   },
   updateShow: function (e) {
-    if (this.itemId == e) return this.mask.active = !1, this.showImg = this.node.getChildByName('cash'), this.showImg.active = !0, this.isget.active = !0, void (this.title.node.color = cc.Color.WHITE)
-    facade.getComponent('GameModel').newbieFetchList.length == this.itemId && (this.now.active = !0, this.title.color = cc.Color(254, 203, 24, 255))
+    if (this.itemId == e) {
+      this.mask.active = false
+      this.showImg = this.node.getChildByName('cash')
+      this.showImg.active = true
+      this.isget.active = true
+      this.title.node.color = cc.Color.WHITE
+      return
+    }
+
+    facade.getComponent('GameModel').newbieFetchList.length == this.itemId && (this.now.active = true, this.title.color = cc.Color(254, 203, 24, 255))
   },
   setItemData: function (e, t) {
     this.itemData = t, this.itemId = e
     const n = facade.getComponent('ShareADModel').GameConfig.InviteB
-    if (this.title.string = '第' + (e + 1) + '个好友', this.rewardCount.string = 'x' + n.Value, this.showImg = this.node.getChildByName('cash'), this.showImg.active = !0, t == null) this.now.active = !1, this.mask.active = !0, this.isget.active = !1
-    else {
+    this.title.string = '第' + (e + 1) + '个好友'
+    this.rewardCount.string = 'x' + n.Value
+    this.showImg = this.node.getChildByName('cash')
+    this.showImg.active = true
+    if (t == null) {
+      this.now.active = false
+      this.mask.active = true
+      this.isget.active = false
+    } else {
       const i = facade.getComponent('GameModel').newbieFetchList
-      for (const o in this.now.active = i.length == this.itemId, this.mask.active = !1, this.isget.active = !0, i) {
+      for (const o in this.now.active = i.length == this.itemId, this.mask.active = false, this.isget.active = true, i) {
         if (i[o] == this.itemData.user_id) {
-          this.isget.active = !0, this.isInList = !0
+          this.isget.active = true, this.isInList = true
           break
         }
       }

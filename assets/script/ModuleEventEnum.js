@@ -1,4 +1,3 @@
-const n = module.exports = {}
 const t = module
 let i
 
@@ -6,9 +5,9 @@ function o (e, t, n) {
   return t in e
     ? Object.defineProperty(e, t, {
       value: n,
-      enumerable: !0,
-      configurable: !0,
-      writable: !0
+      enumerable: true,
+      configurable: true,
+      writable: true
     })
     : e[t] = n, e
 }

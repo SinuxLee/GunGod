@@ -14,14 +14,20 @@ cc.Class({
     let e = Number(window.facade.getComponent('LevelModel').getUnlockedLevelByType(facade.selectedLevelType)) - 1
     e < 0 && (e = 0)
     const t = e + '/' + window.facade.getComponent('LevelModel').getLevelNumByType(facade.selectedLevelType)
-    this.prograssLabel.getComponent('TextureLabel').setText(t), this.chapters = window.facade.getComponent('LevelModel').getChapters(), this.scrollContent.removeAllChildren()
+    this.prograssLabel.getComponent('TextureLabel').setText(t)
+    this.chapters = window.facade.getComponent('LevelModel').getChapters()
+    this.scrollContent.removeAllChildren()
     let n = 0
     for (const o in this.chapters) {
       n++
       const a = cc.instantiate(this.chapterPre)
-      a.data = this.chapters[o], this.scrollContent.addChild(a), this.scrollContent.height = n * a.height, this.scrollContent.height
+      a.data = this.chapters[o]
+      this.scrollContent.addChild(a)
+      this.scrollContent.height = n * a.height
+      this.scrollContent.height
     }
-    this.inited = !0, setTimeout(this.delayScroll.bind(this), 100)
+    this.inited = true
+    setTimeout(this.delayScroll.bind(this), 100)
   },
   delayScroll: function () {
     this.currentLevel = window.facade.getComponent('LevelModel').getUnlockedLevelByType(facade.selectedLevelType)
@@ -33,7 +39,7 @@ cc.Class({
     cc.director.getScene().getChildByName('Canvas').getComponent('MainUI').hideSelectPanel()
   },
   onDisable: function () {
-    this.inited = !1
+    this.inited = false
   },
   update: function (e) {
     this.node.active && !this.inited && this.init()

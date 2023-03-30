@@ -1,6 +1,3 @@
-const n = module.exports = {}
-const t = module
-
 const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
   ? function (e) {
     return typeof e
@@ -8,7 +5,8 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
   : function (e) {
     return e && typeof Symbol === 'function' && e.constructor === Symbol && e !== Symbol.prototype ? 'symbol' : typeof e
   }
-  cc.sys.platform === cc.sys.WECHAT_GAME && (function () {
+
+cc.sys.platform === cc.sys.WECHAT_GAME && (function () {
   function t (e) {
     function t (e) {
       return Object.prototype.toString.call(e)
@@ -27,7 +25,18 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
   }
 
   function o (e, t) {
-    v++, e.as = y, e.at = S, e.rq_c = v, e.ifo = h, e.ak = d.app_key, e.uu = u, e.v = r, e.st = Date.now(), e.ev = t, e.wsr = C, a(e.ufo) !== '' && (e.ufo = e.ufo), e.ec = f, wx.Queue.push(function () {
+    v++
+    e.as = y
+    e.at = S
+    e.rq_c = v
+    e.ifo = h
+    e.ak = d.app_key
+    e.uu = u
+    e.v = r
+    e.st = Date.now()
+    e.ev = t
+    e.wsr = C
+    a(e.ufo) !== '' && (e.ufo = e.ufo), e.ec = f, wx.Queue.push(function () {
       return new Promise(function (t, n) {
         wx.request({
           url: 'https://' + l + '.aldwx.com/d.html',
@@ -77,16 +86,17 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
     }
   })
   var h = ''
+
   var u = (function () {
     let e = ''
     try {
-      e = wx.getStorageSync('aldstat_uuid'), wx.setStorageSync('ald_ifo', !0)
+      e = wx.getStorageSync('aldstat_uuid'), wx.setStorageSync('ald_ifo', true)
     } catch (t) {
       e = 'uuid_getstoragesync'
     }
-    if (e) h = !1
+    if (e) h = false
     else {
-      e = n(), h = !0
+      e = n(), h = true
       try {
         wx.setStorageSync('aldstat_uuid', e)
       } catch (e) {
@@ -95,6 +105,7 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
     }
     return e
   }())
+
   const p = {}
   var m = ''
   var g = ''
@@ -107,8 +118,8 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
   let E = 0
   let _ = ''
   var L = ''
-  let T = !0
-  let I = !1
+  let T = true
+  let I = false
   const R = ['aldSendEvent', 'aldOnShareAppMessage', 'aldShareAppMessage', 'aldSendSession', 'aldSendOpenid', 'aldLevelEvent']
   const N = ['payStart', 'paySuccess', 'payFail', 'die', 'revive', 'tools', 'award']
   const M = ['complete', 'fail']
@@ -191,12 +202,12 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
     e[0] !== '' && (t.ufo = e[0], _ = e[0]), o(t, 'init')
   }), wx.onShow(function (e) {
     if (C = e, E = Date.now(), !T && !I) {
-      S = '' + Date.now() + Math.floor(1e7 * Math.random()), h = !1
+      S = '' + Date.now() + Math.floor(1e7 * Math.random()), h = false
       try {
-        wx.setStorageSync('ald_ifo', !1)
+        wx.setStorageSync('ald_ifo', false)
       } catch (e) {}
     }
-    T = !1, I = !1
+    T = false, I = false
     const t = s(p)
     const n = s(p)
     t.sm = E - w, e.query.ald_share_src && e.shareTicket && e.scene === '1044'
@@ -242,7 +253,7 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
     },
     aldOnShareAppMessage: function (e) {
       wx.onShareAppMessage(function () {
-        I = !0
+        I = true
         const n = e()
         let i = ''
         i = void 0 !== C.query.ald_share_src ? void 0 !== n.query ? (C.query.ald_share_src.indexOf(u), n.query + '&ald_share_src=' + C.query.ald_share_src + ',' + u) : (C.query.ald_share_src.indexOf(u), 'ald_share_src=' + C.query.ald_share_src + ',' + u) : void 0 !== n.query ? n.query + '&ald_share_src=' + u : 'ald_share_src=' + u, t(n.ald_desc) != 'undefined' && (i += '&ald_desc=' + n.ald_desc), n.query = i
@@ -251,7 +262,7 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
       })
     },
     aldShareAppMessage: function (e) {
-      I = !0
+      I = true
       const n = e
       let i = ''
       i = void 0 !== C.query.ald_share_src ? void 0 !== n.query ? (C.query.ald_share_src.indexOf(u), n.query + '&ald_share_src=' + C.query.ald_share_src + ',' + u) : (C.query.ald_share_src.indexOf(u), 'ald_share_src=' + C.query.ald_share_src + ',' + u) : void 0 !== n.query ? n.query + '&ald_share_src=' + u : 'ald_share_src=' + u
@@ -286,7 +297,7 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
   }
   wx.aldStage = new function () {
     function e (e) {
-      return !/^\d+(.\d+)*$/.test(e.stageId) || e.stageId.length > 32 ? (console.warn('关卡stageId必须符合传参规则,请参考文档。'), !1) : !(t(e.stageName) !== 'string' || e.stageName.length > 32) || (console.warn('关卡名称为必传字段,且长度小于32个字符,请参考文档'), !1)
+      return !/^\d+(.\d+)*$/.test(e.stageId) || e.stageId.length > 32 ? (console.warn('关卡stageId必须符合传参规则,请参考文档。'), false) : !(t(e.stageName) !== 'string' || e.stageName.length > 32) || (console.warn('关卡名称为必传字段,且长度小于32个字符,请参考文档'), false)
     }
     let n = ''
     let i = ''
@@ -313,7 +324,14 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
           state: 'end'
         }
         if ((t(i.userId) === 'string' && i.userId) < 32 && (this.uid = i.uid), !t(i.event) && M.join(',').indexOf(i.event + ',') !== -1) return void M.join(',')
-        o.sid = i.stageId, o.snm = i.stageName, o.event = i.event, o.sdr = a !== 0 ? Date.now() - a : '', o.params = {}, t(i.params) === 'object' && t(i.params.desc) === 'string' && i.params.desc.length < 64 && (o.params.desc = i.params.desc), n = o, this.request()
+        o.sid = i.stageId
+        o.snm = i.stageName
+        o.event = i.event
+        o.sdr = a !== 0 ? Date.now() - a : ''
+        o.params = {}
+        t(i.params) === 'object' && t(i.params.desc) === 'string' && i.params.desc.length < 64 && (o.params.desc = i.params.desc)
+        n = o
+        this.request()
       }
     }, this.request = function () {
       const e = s(p)
@@ -324,14 +342,35 @@ const i = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol'
     !(function (e, t) {
       Object.defineProperty(wx, e, {
         value: t,
-        writable: !1,
-        enumerable: !0,
-        configurable: !0
+        writable: false,
+        enumerable: true,
+        configurable: true
       })
     }(R[b], A[R[b]]))
   }
+
   try {
     const D = wx.getSystemInfoSync()
-    p.br = D.brand || '', p.md = D.model, p.pr = D.pixelRatio, p.sw = D.screenWidth, p.sh = D.screenHeight, p.ww = D.windowWidth, p.wh = D.windowHeight, p.lang = D.language, p.wv = D.version, p.sv = D.system, p.wvv = D.platform, p.fs = D.fontSizeSetting, p.wsdk = D.SDKVersion, p.bh = D.benchmarkLevel || '', p.bt = D.battery || '', p.wf = D.wifiSignal || '', p.lng = '', p.lat = '', p.nt = '', p.spd = '', p.ufo = ''
+    p.br = D.brand || ''
+    p.md = D.model
+    p.pr = D.pixelRatio
+    p.sw = D.screenWidth
+    p.sh = D.screenHeight
+    p.ww = D.windowWidth
+    p.wh = D.windowHeight
+    p.lang = D.language
+    p.wv = D.version
+    p.sv = D.system
+    p.wvv = D.platform
+    p.fs = D.fontSizeSetting
+    p.wsdk = D.SDKVersion
+    p.bh = D.benchmarkLevel || ''
+    p.bt = D.battery || ''
+    p.wf = D.wifiSignal || ''
+    p.lng = ''
+    p.lat = ''
+    p.nt = ''
+    p.spd = ''
+    p.ufo = ''
   } catch (e) {}
 }())

@@ -2,7 +2,17 @@ cc.Class({
   extends: cc.Component,
   properties: {},
   onLoad: function () {
-    this._lib = {}, this._curKey = '', this._loadedUrls = {}, this.resLoadings = [], this.altasLoadings = [], this.spineLoadings = [], this._loadedSpineUrls = [], this._loadedFloorBgs = [], this._loadedDecos = [], this.resLoadingIndex = 0, this.spineCallback
+    this._lib = {}
+    this._curKey = ''
+    this._loadedUrls = {}
+    this.resLoadings = []
+    this.altasLoadings = []
+    this.spineLoadings = []
+    this._loadedSpineUrls = []
+    this._loadedFloorBgs = []
+    this._loadedDecos = []
+    this.resLoadingIndex = 0
+    this.spineCallback
   },
   setCurKey: function (e) {
     this._curKey = e
@@ -10,6 +20,7 @@ cc.Class({
   getCurKey: function () {
     return this._curKey
   },
+
   updateGameTexture: function (e, t, n) {
     this.updateTexture(this._curKey, t, e, n)
   },
@@ -45,14 +56,14 @@ cc.Class({
       sp: t,
       wl: n,
       hl: i
-    }), this._waitings.length <= 0 || this._inLoading || (this._inLoading = !0, cc.loader.load({
+    }), this._waitings.length <= 0 || this._inLoading || (this._inLoading = true, cc.loader.load({
       url: this._waitings[0].url,
       type: 'png'
     }, function (e, t) {
       if (!e) {
         const n = new cc.SpriteFrame()
         if (n.setTexture(t), this._spriteFrameCache[this._waitings[0].url] = n, this._waitings[0].sp) this._waitings[0].sp.spriteFrame = n
-        this._waitings.shift(), this._inLoading = !1, setTimeout(this.loadTextureOneByOne.bind(this), 100)
+        this._waitings.shift(), this._inLoading = false, setTimeout(this.loadTextureOneByOne.bind(this), 100)
       }
     }.bind(this)))
   },
@@ -76,7 +87,8 @@ cc.Class({
       const o = t[i]
       const a = cc.find(o.ui, e)
       let s = o.url
-      s = o.preloaded ? 'spine/' + s : 'pre_spine/' + s, a != null ? this.getResSpine(s, a.getComponent(sp.Skeleton), o.initAnimate.split(','), i === t.length - 1) : console.error('node null:', o.ui)
+      s = o.preloaded ? 'spine/' + s : 'pre_spine/' + s
+      a != null ? this.getResSpine(s, a.getComponent(sp.Skeleton), o.initAnimate.split(','), i === t.length - 1) : console.error('node null:', o.ui)
     }
   },
   getResSpine: function (e, t, n, i) {
@@ -85,15 +97,20 @@ cc.Class({
       e = o[0] + '_low/' + o[1] + '_low'
     }
     if (cc.loader.getRes(e, sp.SkeletonData)) {
-      if (t.skeletonData = cc.loader.getRes(e, sp.SkeletonData), n != null && n.length > 0) { for (let a = 0; a < n.length; a++) a == 0 ? a + 1 == n.length ? t.setAnimation(0, n[a], !0) : t.setAnimation(0, n[a], !1) : a + 1 == n.length ? t.addAnimation(0, n[a], !0) : t.addAnimation(0, n[a], !1) }
+      if (t.skeletonData = cc.loader.getRes(e, sp.SkeletonData), n != null && n.length > 0) { for (let a = 0; a < n.length; a++) a == 0 ? a + 1 == n.length ? t.setAnimation(0, n[a], true) : t.setAnimation(0, n[a], false) : a + 1 == n.length ? t.addAnimation(0, n[a], true) : t.addAnimation(0, n[a], false) }
       i && this.spineCallback && this.spineCallback.onResSucc()
     } else {
       const s = window.textureManager.getComponent('TextureManager').formaSpineName('spine/loading')
-      t.skeletonData = cc.loader.getRes(s, sp.SkeletonData), t.premultipliedAlpha = !1, t.setAnimation(0, 'yangchao', !0), t.node.originScale = t.node.scaleX, this.spineLoadings.push({
+      t.skeletonData = cc.loader.getRes(s, sp.SkeletonData)
+      t.premultipliedAlpha = false
+      t.setAnimation(0, 'yangchao', true)
+      t.node.originScale = t.node.scaleX
+      this.spineLoadings.push({
         url: e,
         sk: t,
         anis: n
-      }), cc.loader.loadRes(e, sp.SkeletonData, this.gotSpine.bind(this))
+      })
+      cc.loader.loadRes(e, sp.SkeletonData, this.gotSpine.bind(this))
     }
   },
   gotSpine: function (e, t) {
@@ -101,8 +118,11 @@ cc.Class({
       const i = this.spineLoadings[n]
       const o = cc.loader.getRes(i.url, sp.SkeletonData)
       if (o) {
-        if (i.sk.skeletonData = o, i.anis != null && i.anis.length > 0) { for (let a = 0; a < i.anis.length; a++) a == 0 ? a + 1 == i.anis.length ? i.sk.setAnimation(0, i.anis[a], !0) : i.sk.setAnimation(0, i.anis[a], !1) : a + 1 == i.anis.length ? i.sk.addAnimation(0, i.anis[a], !0) : i.sk.addAnimation(0, i.anis[a], !1) }
-        this._loadedSpineUrls.push(i.url), this.spineLoadings.splice(n, 1), i.sk.node.scale = i.sk.node.originScale, n--
+        if (i.sk.skeletonData = o, i.anis != null && i.anis.length > 0) { for (let a = 0; a < i.anis.length; a++) a == 0 ? a + 1 == i.anis.length ? i.sk.setAnimation(0, i.anis[a], true) : i.sk.setAnimation(0, i.anis[a], false) : a + 1 == i.anis.length ? i.sk.addAnimation(0, i.anis[a], true) : i.sk.addAnimation(0, i.anis[a], false) }
+        this._loadedSpineUrls.push(i.url)
+        this.spineLoadings.splice(n, 1)
+        i.sk.node.scale = i.sk.node.originScale
+        n--
       }
       n == this.spineLoadings.length - 1 && this.spineCallback && this.spineCallback.onResSucc()
     }
@@ -142,14 +162,18 @@ cc.Class({
   getResTexture: function (e, t, n, i, o) {
     if (cc.loader.getRes(e)) {
       if (t == null) return
-      t.spriteFrame = cc.loader.getRes(e, cc.SpriteFrame), t.node.width >= t.node.height ? n != null && t.node.width > n && (t.node.scale = n / t.node.width) : i != null && t.node.height > i && (t.node.scale = i / t.node.height)
+      t.spriteFrame = cc.loader.getRes(e, cc.SpriteFrame)
+      t.node.width >= t.node.height ? n != null && t.node.width > n && (t.node.scale = n / t.node.width) : i != null && t.node.height > i && (t.node.scale = i / t.node.height)
     } else {
-      o != 0 && t && (t.node.opacity = 0), this.resLoadings.push({
+      o != 0 && t && (t.node.opacity = 0)
+      this.resLoadings.push({
         url: e,
         sp: t,
         wl: n,
         hl: i
-      }), this.resLoadingIndex++, cc.loader.loadRes(e, cc.SpriteFrame, this.gotResTexture.bind(this))
+      })
+      this.resLoadingIndex++
+      cc.loader.loadRes(e, cc.SpriteFrame, this.gotResTexture.bind(this))
     }
   },
   gotResTexture: function (e, t) {
@@ -162,36 +186,66 @@ cc.Class({
         a.sp.node.opacity = 255
         o = a.wl
         const s = a.hl
-        a.sp.node.width >= a.sp.node.height ? o != null && a.sp.node.width > o && (a.sp.node.scale = o / a.sp.node.width) : s != null && a.sp.node.height > s && (a.sp.node.scale = s / a.sp.node.height), this._loadedUrls[this.resLoadings[n].url] = !0, this.resLoadings.splice(n, 1), n--
+        a.sp.node.width >= a.sp.node.height ? o != null && a.sp.node.width > o && (a.sp.node.scale = o / a.sp.node.width) : s != null && a.sp.node.height > s && (a.sp.node.scale = s / a.sp.node.height), this._loadedUrls[this.resLoadings[n].url] = true, this.resLoadings.splice(n, 1), n--
       }
     }
   },
   getDecoTexture: function (e, t, n, i) {
-    this._loadedDecos.push(e), this.getResTexture(e, t, n, i)
+    this._loadedDecos.push(e)
+    this.getResTexture(e, t, n, i)
   },
   getFloorBg: function (e, t) {
-    this._loadedFloorBgs.push(e), this.getResTexture(e, t, null, null, !1)
+    this._loadedFloorBgs.push(e)
+    this.getResTexture(e, t, null, null, false)
   },
   releaseAllFloorRes: function () {
-    for (var e = 0; e < this._loadedDecos.length; e++) cc.loader.releaseRes(this._loadedDecos[e], cc.SpriteFrame), cc.loader.releaseRes(this._loadedDecos[e], cc.Texture2D)
+    for (var e = 0; e < this._loadedDecos.length; e++) {
+      cc.loader.releaseRes(this._loadedDecos[e], cc.SpriteFrame)
+      cc.loader.releaseRes(this._loadedDecos[e], cc.Texture2D)
+    }
+
     this._loadedDecos = []
-    for (e = 0; e < this._loadedFloorBgs.length; e++) cc.loader.releaseRes(this._loadedFloorBgs[e], cc.SpriteFrame), cc.loader.releaseRes(this._loadedFloorBgs[e], cc.Texture2D)
+    for (e = 0; e < this._loadedFloorBgs.length; e++) {
+      cc.loader.releaseRes(this._loadedFloorBgs[e], cc.SpriteFrame)
+      cc.loader.releaseRes(this._loadedFloorBgs[e], cc.Texture2D)
+    }
     this._loadedFloorBgs = []
   },
   releaseAllResSprite: function (e) {
-    for (var e in this._loadedUrls) cc.loader.releaseRes(e, cc.SpriteFrame), cc.loader.releaseRes(e, cc.Texture2D)
+    for (var e in this._loadedUrls) {
+      cc.loader.releaseRes(e, cc.SpriteFrame)
+      cc.loader.releaseRes(e, cc.Texture2D)
+    }
     this._loadedUrls = {}
   },
   releaseSprite: function (e) {
-    cc.loader.releaseRes(e, cc.SpriteFrame), cc.loader.releaseRes(e, cc.Texture2D)
+    cc.loader.releaseRes(e, cc.SpriteFrame)
+    cc.loader.releaseRes(e, cc.Texture2D)
   },
   release: function (e) {
     if (this._lib[e]) {
       let t; let n; const i = this._lib[e]
       let o = void 0
       let a = void 0
-      for (i.refs = null, delete i.refs, i.sfs = null, delete i.sfs, a = i.textures, n = i.urls, t = a.length, o = 0; o < t; ++o) cc.loader.release(n[o]), a[o].releaseTexture()
-      i.urls.length = 0, delete i.urls, a.length = 0, delete i.textures, this._lib[e] = null, delete this._lib[e]
+      i.refs = null
+      delete i.refs
+      i.sfs = null
+      delete i.sfs
+      a = i.textures
+      n = i.urls
+      t = a.length
+
+      for (o = 0; o < t; ++o) {
+        cc.loader.release(n[o])
+        a[o].releaseTexture()
+      }
+
+      i.urls.length = 0
+      delete i.urls
+      a.length = 0
+      delete i.textures
+      this._lib[e] = null
+      delete this._lib[e]
     }
   },
   releaseGame: function () {

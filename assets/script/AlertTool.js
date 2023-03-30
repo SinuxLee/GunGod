@@ -1,4 +1,3 @@
-const n = module.exports = {}
 const t = module
 
 const i = {
@@ -6,7 +5,7 @@ const i = {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.showToast({
       title: e,
       icon: 'none',
-      mask: !0,
+      mask: true,
       duration: 2e3
     })
   },
@@ -14,7 +13,7 @@ const i = {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.showToast({
       title: e,
       icon: 'success',
-      mask: !0,
+      mask: true,
       duration: 2e3
     })
   },

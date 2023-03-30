@@ -1,4 +1,5 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
+
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -30,7 +31,8 @@ cc.Class({
     }
     window.facade.getComponent('ShareADModel').showShareAD(e, {
       succ: function (e) {
-        console.log('拉活 分享/视频:', e), popUp.getComponent('FloatTip').showTip('分享成功')
+        console.log('拉活 分享/视频:', e)
+        popUp.getComponent('FloatTip').showTip('分享成功')
         const t = facade.getComponent('GameModel').aliveFetchList
         facade.getComponent('GameModel').applyInviteAliveReward(t.length, '123')
       },
@@ -43,6 +45,6 @@ cc.Class({
     popUp.getComponent('Pop').removeTop()
   },
   doClose: function () {
-    cc.systemEvent.off(i.GAME_OPEN_DAILY_INVITE, this.initContent, this)
+    cc.systemEvent.off(ModuleEventEnum.GAME_OPEN_DAILY_INVITE, this.initContent, this)
   }
 })

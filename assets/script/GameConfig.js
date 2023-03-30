@@ -1,10 +1,8 @@
 const n = module.exports = {}
 const t = module
-// 特价9.9元一套cocoscreator代码联系Q2483367084
-// 截图 链接：https://share.weiyun.com/leGAHpnB 密码：b9udtv
-Object.defineProperty(n, '__esModule', {
-  value: !0
-}), window.gameVersion = '201901010000'
+
+window.gameVersion = '201901010000'
+
 const i = n.GameConfig = {
   gameVersion: window.gameVersion,
   isOpen: 1,
@@ -32,4 +30,6 @@ const i = n.GameConfig = {
     return Date.parse(new Date()).toString().substr(0, 10)
   }
 }
-typeof gmbox !== 'undefined' ? i.PLATFORM = 'viso' : cc.sys.platform === cc.sys.WECHAT_GAME ? i.PLATFORM = 'wx' : i.PLATFORM = '', t.exports = i
+
+typeof gmbox !== 'undefined' ? i.PLATFORM = 'viso' : cc.sys.platform === cc.sys.WECHAT_GAME ? i.PLATFORM = 'wx' : i.PLATFORM = ''
+t.exports = i

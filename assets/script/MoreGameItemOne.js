@@ -1,5 +1,6 @@
-const i = require('MoreGameManager')
+const MoreGameManager = require('MoreGameManager')
 const o = require('AnalyticsUtilities').AnalyticsUtilities
+
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -12,10 +13,10 @@ cc.Class({
     pointL: cc.Label,
     getNode: cc.Node
   },
-  onLoad: function () {},
+
   setupItemData: function (e) {
     if (this.data = e, e && e.name) {
-      this.node.active = !0
+      this.node.active = true
       const t = e.name
       if (void 0 != t && (this.nameL.string = t), e.icon && e.icon.indexOf('http') == 0) {
         const n = this
@@ -26,15 +27,15 @@ cc.Class({
           n.iconImg && t && (n.iconImg.spriteFrame = new cc.SpriteFrame(t))
         })
       }
-    } else this.node.active = !1
+    } else this.node.active = false
   },
-  update: function () {},
+
   btnGoGameOnClick: function (e) {
     e == 1 && o.logEvent('主界面_更多游戏', {
       appId: this.data.appId
     })
     const t = this.data.appId
     const n = this.data.extra
-    t && i.navigateToMiniProgram(t, n)
+    t && MoreGameManager.navigateToMiniProgram(t, n)
   }
 })

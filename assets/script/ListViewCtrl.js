@@ -6,13 +6,19 @@ cc.Class({
     spacing: 0,
     bufferZone: 0,
     itemAnchor: 1,
-    vertical: !0,
+    vertical: true,
     itemTemplate: cc.Node,
     scrollView: cc.ScrollView,
     content: cc.Node
   },
   onLoad: function () {
-    this.items = [], this.totalCount = 0, this.lastContentPosY = 0, this.lastContentPosX = 0, this.initialize(), this.content.originY = this.content.y, this.content.originX = this.content.x
+    this.items = []
+    this.totalCount = 0
+    this.lastContentPosY = 0
+    this.lastContentPosX = 0
+    this.initialize()
+    this.content.originY = this.content.y
+    this.content.originX = this.content.x
   },
   initialize: function () {
     for (let e = 0; e < this.spawnCount; ++e) {
@@ -21,30 +27,37 @@ cc.Class({
     }
   },
   setList: function (e, t, n) {
-    if (this.showData = e, this.custom = n, this.totalCount = this.showData.length, this.vertical) {
-      if (this.content.y = this.content.originY, this.content.height = this.totalCount * (this.itemTemplate.height + this.spacing) + this.spacing, this.content.height < this.scrollView.height && (this.content.height = this.scrollView.height), this.items && this.items.length > 0) {
+    this.showData = e
+    this.custom = n
+    this.totalCount = this.showData.length
+    if (this.vertical) {
+      this.content.y = this.content.originY
+      this.content.height = this.totalCount * (this.itemTemplate.height + this.spacing) + this.spacing
+      this.content.height < this.scrollView.height && (this.content.height = this.scrollView.height)
+      if (this.items && this.items.length > 0) {
         for (let i = 0; i < this.items.length; i++) {
           const o = this.items[i]
-          this.showData[i] ? (o.active = !0, o.getComponent(this.itemName).setItemData(i, i, this.showData[i], this.custom), this.itemAnchor == 1 ? o.setPosition(0, -o.height * i - this.spacing * (i + 1)) : o.setPosition(0, -o.height * (0.5 + i) - this.spacing * (i + 1)), t && this.iteamAction(i, o)) : o.active = !1
+          this.showData[i] ? (o.active = true, o.getComponent(this.itemName).setItemData(i, i, this.showData[i], this.custom), this.itemAnchor == 1 ? o.setPosition(0, -o.height * i - this.spacing * (i + 1)) : o.setPosition(0, -o.height * (0.5 + i) - this.spacing * (i + 1)), t && this.iteamAction(i, o)) : o.active = false
         }
       }
     } else if (this.content.x = this.content.originX, this.content.width = this.totalCount * (this.itemTemplate.width + this.spacing) + this.spacing, this.content.width < this.scrollView.width && (this.content.width = this.scrollView.width), this.items && this.items.length > 0) {
       for (let a = 0; a < this.items.length; a++) {
         const s = this.items[a]
-        this.showData[a] ? (s.active = !0, s.getComponent(this.itemName).setItemData(a, a, this.showData[a], this.custom), this.itemAnchor == 1 ? s.setPosition((s.width + this.spacing) * a, 0) : s.setPosition((s.width + this.spacing) * a + (s.width + this.spacing) / 2, 0)) : s.active = !1
+        this.showData[a] ? (s.active = true, s.getComponent(this.itemName).setItemData(a, a, this.showData[a], this.custom), this.itemAnchor == 1 ? s.setPosition((s.width + this.spacing) * a, 0) : s.setPosition((s.width + this.spacing) * a + (s.width + this.spacing) / 2, 0)) : s.active = false
       }
     }
   },
   refreshList: function () {
-    this.totalCount = this.showData.length, this.vertical ? this.content.height = this.totalCount * (this.itemTemplate.height + this.spacing) + this.spacing : this.content.width = this.totalCount * (this.itemTemplate.width + this.spacing) + this.spacing
+    this.totalCount = this.showData.length
+    this.vertical ? this.content.height = this.totalCount * (this.itemTemplate.height + this.spacing) + this.spacing : this.content.width = this.totalCount * (this.itemTemplate.width + this.spacing) + this.spacing
     for (let e = 0; e < this.items.length; e++) {
       const t = this.items[e]
       if (this.showData[e]) {
-        t.active = !0
+        t.active = true
         const n = t.getComponent(this.itemName)
         const i = n.itemID
         n.setItemData(e, i, this.showData[i], this.custom)
-      } else t.active = !1
+      } else t.active = false
     }
   },
   iteamAction: function (e, t) {
@@ -66,7 +79,11 @@ cc.Class({
     if (this.vertical) {
       const t = this.items
       if (t.length == 0) return
-      for (let n = this.bufferZone, i = this.scrollView.content.y < this.lastContentPosY, o = (this.itemTemplate.height + this.spacing) * t.length, a = 0; a < t.length; ++a) {
+
+      const n = this.bufferZone
+      const i = this.scrollView.content.y < this.lastContentPosY
+      const o = (this.itemTemplate.height + this.spacing) * t.length
+      for (let a = 0; a < t.length; ++a) {
         const s = this.getPositionInView(t[a])
         if (i) {
           if (s.y < -n && t[a].y + o < 0) {
@@ -86,7 +103,11 @@ cc.Class({
     } else {
       const h = this.items
       if (h.length == 0) return
-      for (let u = this.bufferZone, p = this.scrollView.content.x < this.lastContentPosX, m = (this.itemTemplate.width + this.spacing) * h.length, g = 0; g < h.length; g++) {
+
+      const u = this.bufferZone
+      const p = this.scrollView.content.x < this.lastContentPosX
+      const m = (this.itemTemplate.width + this.spacing) * h.length
+      for (let g = 0; g < h.length; g++) {
         const f = this.getPositionInView(h[g])
         if (p) {
           if (f.x < -u && h[g].x + m < this.scrollView.content.width) {
@@ -111,6 +132,8 @@ cc.Class({
         const t = this.items[e]
         window.pool.put(this.itemName, t)
       }
-    } else window.pool.create(this.itemName, this.spawnCount, cc.instantiate(this.itemTemplate))
+    } else {
+      window.pool.create(this.itemName, this.spawnCount, cc.instantiate(this.itemTemplate))
+    }
   }
 })

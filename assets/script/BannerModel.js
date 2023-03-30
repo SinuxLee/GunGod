@@ -1,20 +1,20 @@
-const i = require('Network')
+const Network = require('Network')
+
 cc.Class({
   extends: cc.Component,
   properties: {
     bannerAd: null,
-    isTransfinite: !1,
-    isOpen: !1,
-    isInclude: !1,
+    isTransfinite: false,
+    isOpen: false,
+    isInclude: false,
     showCount: 0,
     hideCount: 0,
     delayTime: 2e3,
     mistakeTime: 2e3,
-    isRandomLoc: !1,
-    isRandomLocInclude: !1
+    isRandomLoc: false,
+    isRandomLocInclude: false
   },
-  initConfig: function () {},
-  onLoad: function () {},
+
   initBanner: function () {
     if (window.facade.bannerWidth = 300, window.facade.bannerHeight = 226, facade.isMiniGame) {
       facade.Screenratio && 1 / facade.Screenratio > 2.06 && (window.facade.bannerHeight = 290), this.leftSize = 0, window.facade.windowWidth > window.facade.bannerWidth && (this.leftSize = (window.facade.windowWidth - window.facade.bannerWidth) / 2)
@@ -65,7 +65,7 @@ cc.Class({
     const t = function (e) {
       e && e.endDelay()
     }
-    if (this.isShowVirBanner = !0, facade.isMiniGame) {
+    if (this.isShowVirBanner = true, facade.isMiniGame) {
       if (window.facade.SAVE_MODE) return
       if (this.isTransfinite) return console.log('lc banner-- 展示次数超过限制'), void t(e)
       if (!this.isOpen) return console.log('lc banner-- 误点功能未开放, 延迟'), void t(e)
@@ -80,7 +80,7 @@ cc.Class({
     }, this.delayTime))
   },
   hideBanner: function () {
-    this.mistakeTimer != null && (clearTimeout(this.mistakeTimer), this.mistakeTimer = null), this.delayTimer != null && (clearTimeout(this.delayTimer), this.delayTimer = null), this.isShowBanner = !1, this.bannerAd != null && this.bannerAd.hide()
+    this.mistakeTimer != null && (clearTimeout(this.mistakeTimer), this.mistakeTimer = null), this.delayTimer != null && (clearTimeout(this.delayTimer), this.delayTimer = null), this.isShowBanner = false, this.bannerAd != null && this.bannerAd.hide()
   },
   setupDelay: function (e) {
     e && (e.startDelay(), this.setupBanner(null), this.delayTime > 0
@@ -91,7 +91,7 @@ cc.Class({
   },
   setupMistake: function (e) {
     const t = this
-    e && (this.isRandom = !1, this.isRandomLoc && !this.isRandomLocInclude && (this.isRandom = !0), e.startMistake(this.getStartRandomLocation()), this.mistakeTime > 0
+    e && (this.isRandom = false, this.isRandomLoc && !this.isRandomLocInclude && (this.isRandom = true), e.startMistake(this.getStartRandomLocation()), this.mistakeTime > 0
       ? this.mistakeTimer = setTimeout(function () {
         t.isShowBanner ? e.endMistake(t.getEndRandomLocation()) : t.setupBanner(e)
       }, this.mistakeTime)
@@ -121,9 +121,9 @@ cc.Class({
   setupBanner: function (e) {
     const t = this
     const n = this
-    this.isShowVirBanner && (this.isShowVirBanner = !1, e != null && e.endMistake(n.getEndRandomLocation())), this.bannerAd != null
+    this.isShowVirBanner && (this.isShowVirBanner = false, e != null && e.endMistake(n.getEndRandomLocation())), this.bannerAd != null
       ? (this.bannerAd.show().then(function () {
-          n.isShowBanner = !0, n.uploadBannerShow(), e != null && e.endMistake(n.getEndRandomLocation())
+          n.isShowBanner = true, n.uploadBannerShow(), e != null && e.endMistake(n.getEndRandomLocation())
         }), this.bannerAd.onError(function (i) {
           t.bannerAd = null, console.log('lc banner-- 显示 err = ' + i), e != null && e.endMistake(n.getEndRandomLocation())
         }), this.rePosBanner())
@@ -153,12 +153,12 @@ cc.Class({
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token
     }
-    i.postRequest(t, n, {
+    Network.postRequest(t, n, {
       success: function (t) {
         e.isTransfinite = t.is_show != 1, e.saveBannerCount()
       },
       failure: function (t) {
-        e.isTransfinite = !1
+        e.isTransfinite = false
       }
     })
   }

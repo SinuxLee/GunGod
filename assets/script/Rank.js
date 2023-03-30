@@ -1,5 +1,4 @@
-require('CommonFunc')
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -11,7 +10,8 @@ cc.Class({
     const e = this
     this.frameCount = 0
     if (facade.isMiniGame) {
-      window.facade.getComponent('PlayerModel').wxAdaptor.wxGetUserInfo(), cc.systemEvent.on(i.USER_INFO_ALLOWED, function () {
+      window.facade.getComponent('PlayerModel').wxAdaptor.wxGetUserInfo()
+      cc.systemEvent.on(ModuleEventEnum.USER_INFO_ALLOWED, function () {
         const e = facade.getComponent('PlayerModel').platUserInfo
         const t = {
           channel: 'wx',
@@ -58,17 +58,18 @@ cc.Class({
     window.facade.getComponent('RankModel').requestRankList(1)
   },
   doClose: function () {
-    cc.systemEvent.off(i.RANK_LIST, this.gotRank, this)
+    cc.systemEvent.off(ModuleEventEnum.RANK_LIST, this.gotRank, this)
   },
   gotRank: function (e) {
     for (let t = 0; t < e.length; t++) e[t].rankNo = t + 1
-    this.scroll.getComponent('ListViewCtrl').setList(e, !1, null)
+    this.scroll.getComponent('ListViewCtrl').setList(e, false, null)
   },
   close: function () {
     window.popUp.getComponent('Pop').removeTop()
   },
   jumpTadayRank: function () {
-    window.popUp.getComponent('Pop').removeTop(), window.popUp.getComponent('Pop').addPopByName('GunMasterRank', this, !0, !0, !1)
+    window.popUp.getComponent('Pop').removeTop()
+    window.popUp.getComponent('Pop').addPopByName('GunMasterRank', this, true, true, false)
   },
   setupList: function (e) {}
 })

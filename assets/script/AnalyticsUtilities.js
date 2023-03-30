@@ -1,8 +1,7 @@
 const n = module.exports = {}
-const t = module
 
 Object.defineProperty(n, '__esModule', {
-  value: !0
+  value: true
 })
 const i = (function () {
   function e () {}

@@ -1,4 +1,4 @@
-const i = require('MoreGameManager')
+const MoreGameManager = require('MoreGameManager')
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -15,7 +15,9 @@ cc.Class({
     effImg: cc.Sprite
   },
   update: function () {
-    if (this.frameCount || (this.frameCount = 0), this.frameCount++, this.frameCount % 5 == 0) {
+    this.frameCount || (this.frameCount = 0)
+    this.frameCount++
+    if (this.frameCount % 5 == 0) {
       if (this.endC > this.startC) {
         var e = this
         if ((n = parseInt(this.count) + parseInt(this.startC)) <= this.endC) {
@@ -45,7 +47,14 @@ cc.Class({
   },
   setupItemData: function (e) {
     if (e && e.name) {
-      this.node.active = !0, this._historyDataArr || (this._historyDataArr = []), this._historyDataArr.push(e), this._historyDataArr.length >= i.getData().length && (this._historyDataArr = []), this.type, this.data = JSON.parse(JSON.stringify(e)), this.appId = this.data.appId, this.path = this.data.extra
+      this.node.active = true
+      this._historyDataArr || (this._historyDataArr = [])
+      this._historyDataArr.push(e)
+      this._historyDataArr.length >= MoreGameManager.getData().length && (this._historyDataArr = [])
+      this.data = JSON.parse(JSON.stringify(e))
+      this.appId = this.data.appId
+      this.path = this.data.extra
+
       const t = this
       if (e.icon != '' && e.icon && e.icon.indexOf('http') == 0 && (cc.loader.load({
         url: e.icon,
@@ -61,13 +70,13 @@ cc.Class({
         const o = e.effect.split(',')
         o.length >= 4 && (this.data.effectUrl = o[0], this.effStartC = parseInt(o[1]), this.effEndC = parseInt(o[2]), this.effType = o[3])
       } else this.effNode && (this.effNode.destroy(), this.effNode.parent = null, this.effNode = null, this.data.effectUrl = null, this.effStartC = 0, this.effEndC = 0, this.effType = null)
-    } else this.node.active = !1
+    } else this.node.active = false
   },
   isInHistory: function (e) {
-    for (let t = 0; t < this._historyDataArr.length; t++) { if (e.icon == this._historyDataArr[t].icon) return !0 }
-    return !1
+    for (let t = 0; t < this._historyDataArr.length; t++) { if (e.icon == this._historyDataArr[t].icon) return true }
+    return false
   },
   btnGoGameOnClick: function () {
-    i.navigateToMiniProgram(this.appId, this.path)
+    MoreGameManager.navigateToMiniProgram(this.appId, this.path)
   }
 })

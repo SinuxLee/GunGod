@@ -1,17 +1,28 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
-  properties: {},
+
   initConfig: function () {},
   onLoad: function () {
-    facade.isMiniGame && (this.userObject = null, this.rewardTplId = null, this.inviteTypeId = null, this.node.addComponent('WxAdaptor'), this.wxAdaptor = this.node.getComponent('WxAdaptor'), this.wxAdaptor.init(this), cc.systemEvent.on(i.GOT_HTTP_RES, this.httpResDeal.bind(this)), facade.isMiniGame && (cc.systemEvent.on(i.WX_REGISTERED, this.onGotToken.bind(this)), cc.systemEvent.on(i.INIT_ROLEINFO_COMPLETED, this.onRoleInfo, this)))
+    if (facade.isMiniGame) {
+      this.userObject = null
+      this.rewardTplId = null
+      this.inviteTypeId = null
+      this.node.addComponent('WxAdaptor')
+      this.wxAdaptor = this.node.getComponent('WxAdaptor')
+      this.wxAdaptor.init(this)
+      cc.systemEvent.on(ModuleEventEnum.GOT_HTTP_RES, this.httpResDeal.bind(this))
+      cc.systemEvent.on(ModuleEventEnum.WX_REGISTERED, this.onGotToken.bind(this))
+      cc.systemEvent.on(ModuleEventEnum.INIT_ROLEINFO_COMPLETED, this.onRoleInfo, this)
+    }
   },
   onGotToken: function () {
     const e = {
       game_id: window.facade.GameId,
       token: this.token
     }
-    window.net.getComponent('Net').httpRequest(window.net.Setting, e), this.checkFuncOpen()
+    window.net.getComponent('Net').httpRequest(window.net.Setting, e)
+    this.checkFuncOpen()
   },
   onRoleInfo: function () {
     this.wxAdaptor.checkBroadcastReward()
@@ -19,25 +30,38 @@ cc.Class({
   httpResDeal: function (e) {
     if (e && e.data) {
       const t = e.data
-      t.extra_config && t.extra_config.online_version && this.checkVersion(t.extra_config.online_version), t[0] && t[0].func_id && (this.addFuncOpenList(t), window.facade.getFunc = !0)
+      t.extra_config && t.extra_config.online_version && this.checkVersion(t.extra_config.online_version)
+      t[0] && t[0].func_id && (this.addFuncOpenList(t), window.facade.getFunc = true)
     }
   },
   checkFuncOpen: function () {
     const e = {}
-    e.game_id = window.facade.GameId, e.token = this.token, window.net.getComponent('Net').httpRequest(window.net.CheckFuncOpen, e)
+    e.game_id = window.facade.GameId
+    e.token = this.token
+    window.net.getComponent('Net').httpRequest(window.net.CheckFuncOpen, e)
   },
   gotServerData: function (e) {
-    this.servers = e, cc.systemEvent.emit(i.GOT_SERVER_INFO)
+    this.servers = e
+    cc.systemEvent.emit(ModuleEventEnum.GOT_SERVER_INFO)
   },
   checkVersion: function (e) {
-    this.verisonValue = Number(e), this.verisonValue < facade.VERSION ? facade.SAVE_MODE = !0 : facade.SAVE_MODE = !1, cc.systemEvent.emit(i.SAVE_MODE_CHANGE)
+    this.verisonValue = Number(e)
+    this.verisonValue < facade.VERSION ? facade.SAVE_MODE = true : facade.SAVE_MODE = false
+    cc.systemEvent.emit(ModuleEventEnum.SAVE_MODE_CHANGE)
   },
   addNoticeData: function (e) {
     this.noticeImgs = e
   },
   addFuncOpenList: function (e) {
-    for (const t in console.log('func opens:', e), this.funcList = {}, this.funcParams = {}, e) this.funcList[e[t].func_id] = e[t].is_open, this.funcParams[e[t].func_id] = e[t].func_params
-    cc.systemEvent.emit(i.FUNCOPEN_UPDATE)
+    console.log('func opens:', e)
+    this.funcList = {}
+    this.funcParams = {}
+    for (const t in e) {
+      this.funcList[e[t].func_id] = e[t].is_open
+      this.funcParams[e[t].func_id] = e[t].func_params
+    }
+
+    cc.systemEvent.emit(ModuleEventEnum.FUNCOPEN_UPDATE)
   },
   isIntersADOpen: function () {
     return !!this.funcList && !(!this.funcList[11] || this.funcList[11] != '1')
@@ -61,10 +85,10 @@ cc.Class({
   },
   checkVirBannerShow: function (e) {
     if (!facade.SAVE_MODE) {
-      if (!this.funcList || !this.funcList[10] || this.funcList[10] != '1') return !1
+      if (!this.funcList || !this.funcList[10] || this.funcList[10] != '1') return false
       const t = this.funcParams[10].split(',')
-      for (const n in t) { if (t[n] === String(facade.uiNames[e])) return !0 }
-      return !1
+      for (const n in t) { if (t[n] === String(facade.uiNames[e])) return true }
+      return false
     }
   },
   getRecommondType: function () {
@@ -98,26 +122,37 @@ cc.Class({
     for (let t = 0; t != e.length;) e[t].navout_cnt > 0 ? e.splice(t, 1) : t++
   },
   isClickCountLimit: function (e) {
-    if (!this.funcParams) return !1
-    if (!this.funcParams[14]) return !1
-    for (let t = this.funcParams[14].split(','), n = 0; n < t.length; n++) { if (t[n] == String(e)) return !0 }
-    return !1
+    if (!this.funcParams) return false
+    if (!this.funcParams[14]) return false
+    for (let t = this.funcParams[14].split(','), n = 0; n < t.length; n++) { if (t[n] == String(e)) return true }
+    return false
   },
   isLoginInterOpen: function () {
-    if (!this.funcParams) return !1
-    if (!this.funcParams[13]) return !1
-    for (let e = this.funcParams[13].split(','), t = facade.channel_id + '_' + facade.channel_sub, n = 0; n < e.length; n++) { if (t == e[n]) return !0 }
-    return !1
+    if (!this.funcParams) return false
+    if (!this.funcParams[13]) return false
+
+    const e = this.funcParams[13].split(',')
+    const t = facade.channel_id + '_' + facade.channel_sub
+    for (let n = 0; n < e.length; n++) { if (t == e[n]) return true }
+    return false
   },
   connectGameServer: function (e) {
-    e == 0 && facade.isMiniGame && window.facade.VERSION > this.verisonValue && (e = facade.SERVER_ID_BETA, facade.SAVE_MODE = !0), this.currentServer = this.servers[e], this.serverAddresss = this.servers[e].websocket, window.net.getComponent('Net').connect(this.serverAddresss)
+    e == 0 && facade.isMiniGame && window.facade.VERSION > this.verisonValue && (e = facade.SERVER_ID_BETA, facade.SAVE_MODE = true), this.currentServer = this.servers[e], this.serverAddresss = this.servers[e].websocket, window.net.getComponent('Net').connect(this.serverAddresss)
   },
   onConnected: function () {
-    if (console.log('onConnected...1'), facade.isMiniGame || window.facade.inQQ) {
-      console.log('onConnected...2'), this._adultType = 3, this._osType = window.facade.PhoneInfo.system.match('iOS') == null ? 1 : 2
+    console.log('onConnected...1')
+    if (facade.isMiniGame || window.facade.inQQ) {
+      console.log('onConnected...2')
+      this._adultType = 3
+      this._osType = window.facade.PhoneInfo.system.match('iOS') == null ? 1 : 2
       let e = String(this.userId)
-      e = this.serverAddresss.match('wss://') ? String(this.userId) : String(this.privateUid), this.loginGameServer(e)
-    } else this._adultType = 3, this._osType = 3, cc.systemEvent.emit(i.NEED_INPUT_ID)
+      e = this.serverAddresss.match('wss://') ? String(this.userId) : String(this.privateUid)
+      this.loginGameServer(e)
+    } else {
+      this._adultType = 3
+      this._osType = 3
+      cc.systemEvent.emit(ModuleEventEnum.NEED_INPUT_ID)
+    }
   },
   loginGameServer: function (e) {
     let t = 1
@@ -126,11 +161,13 @@ cc.Class({
     const i = this.currentServer.id
     facade.isMiniGame ? (t = 1, window.net.getComponent('Net').behaveReport(window.facade.BEHAVE_LOGIN)) : window.facade.inQQ && (t = window.facade.PhoneInfo.system.match('iOS') ? 3 : 2)
     const o = new Message_login.CGReqUserLoginMessage()
-    o.ctor(e, t, this._osType, i, n, this._adultType), window.net.getComponent('Net').send(o)
+    o.ctor(e, t, this._osType, i, n, this._adultType)
+    window.net.getComponent('Net').send(o)
   },
   getTargetRoleInfo: function (e) {
     const t = new Message_role.CSReqViewTargetProfileMessage()
-    t.ctor(e), window.net.getComponent('Net').send(t)
+    t.ctor(e)
+    window.net.getComponent('Net').send(t)
   },
   recordRoleProfile: function () {
     if (this.platUserInfo) {
@@ -171,9 +208,19 @@ cc.Class({
       }
     }
     if (this.roleInfo) {
-      let c = !1
-      for (const r in t) this.roleInfo[r] = t[r], r == 'energyLastRev' && !0, r == 'level' && (n = t[r]), r == 'vip' && t[r] > 0 && !0, r != 'province' && r != 'city' || !0, r != 'midAutumnShop' && r != 'midAutumnRank' || (c = !0)
-      c && cc.systemEvent.emit(i.TITLE_MIDAUTUMNPOINT), n && n != 0 && window.facade.getComponent('RankModel').saveScore(n), this.levelChange = this.roleInfo.level - o, cc.systemEvent.emit(i.ROLE_INFO_UPDATED)
+      let c = false
+      for (const r in t) {
+        this.roleInfo[r] = t[r]
+        r == 'energyLastRev' && true
+        r == 'level' && (n = t[r])
+        r == 'vip' && t[r] > 0 && true
+        r != 'province' && r != 'city' || true
+        r != 'midAutumnShop' && r != 'midAutumnRank' || (c = true)
+      }
+      c && cc.systemEvent.emit(ModuleEventEnum.TITLE_MIDAUTUMNPOINT)
+      n && n != 0 && window.facade.getComponent('RankModel').saveScore(n)
+      this.levelChange = this.roleInfo.level - o
+      cc.systemEvent.emit(ModuleEventEnum.ROLE_INFO_UPDATED)
     }
   }
 })

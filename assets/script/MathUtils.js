@@ -1,7 +1,4 @@
-const n = module.exports = {}
-const t = module
-
-const i = {
+module.exports = {
   getRad: function (e, t) {
     const n = e.x
     const i = e.y
@@ -16,12 +13,17 @@ const i = {
   },
   pointIsInPolygon: function (e, t) {
     let n, i, o, a
-    n = e, i = {
+    n = e
+    i = {
       x: -1e4,
       y: e.y
     }
     for (var s = 0, c = 0; c < t.length - 1; c++) o = t[c], a = t[c + 1], this.checkCross(n, i, o, a) == 1 && s++
-    return o = t[t.length - 1], a = t[0], this.checkCross(n, i, o, a) == 1 && s++, s % 2 != 0
+
+    o = t[t.length - 1]
+    a = t[0]
+    this.checkCross(n, i, o, a) == 1 && s++
+    return s % 2 != 0
   },
   crossMul: function (e, t) {
     return e.x * t.y - e.y * t.x
@@ -52,4 +54,3 @@ const i = {
     }, c <= 0 && this.crossMul(o, s) * this.crossMul(a, s) <= 0
   }
 }
-t.exports = i

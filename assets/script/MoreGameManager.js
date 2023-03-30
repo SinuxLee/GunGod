@@ -1,8 +1,5 @@
-const n = module.exports = {}
-const t = module
-
-const i = require('Network')
-const o = (require('GameConfig'), {
+const Network = require('Network')
+module.exports = {
   requestMoreGameList: function (e) {},
   navigateToMiniProgram: function (e) {
     const t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : ''
@@ -26,13 +23,16 @@ const o = (require('GameConfig'), {
             appId: e,
             path: t,
             success: function () {
-              o.result = 1, i.postRequest('https://games.qdos.com/open/api/record', 'p=' + JSON.stringify(o), {
+              o.result = 1
+              Network.postRequest('https://games.qdos.com/open/api/record', 'p=' + JSON.stringify(o), {
                 success: function (e) {},
                 failure: function (e) {}
               })
             },
             fail: function (e) {
-              o.result = 2, o.errMsg = e, i.postRequest('https://games.qdos.com/open/api/record', 'p=' + JSON.stringify(o), {
+              o.result = 2
+              o.errMsg = e
+              Network.postRequest('https://games.qdos.com/open/api/record', 'p=' + JSON.stringify(o), {
                 success: function (e) {},
                 failure: function (e) {}
               })
@@ -63,5 +63,4 @@ const o = (require('GameConfig'), {
   getData: function () {
     return this._data
   }
-})
-t.exports = o
+}

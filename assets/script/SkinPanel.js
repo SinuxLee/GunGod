@@ -3,19 +3,19 @@ cc.Class({
   properties: {
     recommendPre: cc.Prefab
   },
-  onLoad: function () {},
+
   onEnable: function () {
     net.platformName != 'qq' ? cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4 : facade.getComponent('BannerModel').showBanner()
   },
-  start: function () {},
+
   init: function () {
-    this.inited = !0
+    this.inited = true
   },
   onClose: function () {
     cc.director.getScene().getChildByName('Canvas').getComponent('MainUI').hideSkinPanel()
   },
   onDisable: function () {
-    this.inited = !1, net.platformName != 'qq' ? (cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1, cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = !0) : facade.getComponent('BannerModel').hideBanner()
+    this.inited = false, net.platformName != 'qq' ? (cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1, cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = true) : facade.getComponent('BannerModel').hideBanner()
   },
   update: function (e) {
     this.node.active && !this.inited && this.init()

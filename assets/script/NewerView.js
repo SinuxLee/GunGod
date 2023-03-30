@@ -6,13 +6,15 @@ cc.Class({
     iconVideoFrame: cc.SpriteFrame,
     iconShareFrame: cc.SpriteFrame
   },
-  onLoad: function () {},
+
   start: function () {
-    this.rewardType = window.facade.getComponent('ShareADModel').getShareADType(), this.rewardType != 2 ? (this.iconType.spriteFrame = this.iconVideoFrame, this.type = 'Video') : (this.iconType.spriteFrame = this.iconShareFrame, this.type = 'Share')
+    this.rewardType = window.facade.getComponent('ShareADModel').getShareADType()
+    this.rewardType != 2 ? (this.iconType.spriteFrame = this.iconVideoFrame, this.type = 'Video') : (this.iconType.spriteFrame = this.iconShareFrame, this.type = 'Share')
   },
   initData: function () {},
   doClose: function () {
-    window.facade.getComponent('GameModel').newerRewardCancelCount++, window.facade.getComponent('GameModel').passLevelCount = 0
+    window.facade.getComponent('GameModel').newerRewardCancelCount++
+    window.facade.getComponent('GameModel').passLevelCount = 0
   },
   takeAward: function () {
     const e = {
@@ -31,6 +33,8 @@ cc.Class({
     })
   },
   takeAwardSuccess: function () {
-    window.facade.getComponent('GameModel').takeNewerReward(), window.facade.getComponent('GameModel').newerRewardCancelCount--, popUp.getComponent('Pop').removeTop()
+    window.facade.getComponent('GameModel').takeNewerReward()
+    window.facade.getComponent('GameModel').newerRewardCancelCount--
+    popUp.getComponent('Pop').removeTop()
   }
 })

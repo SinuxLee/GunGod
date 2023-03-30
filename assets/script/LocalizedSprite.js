@@ -1,15 +1,16 @@
-const i = require('SpriteFrameSet')
+const SpriteFrameSet = require('SpriteFrameSet')
+
 cc.Class({
   extends: cc.Component,
   editor: {
-    executeInEditMode: !0,
+    executeInEditMode: true,
     inspector: 'packages://i18n/inspector/localized-sprite.js',
     menu: 'i18n/LocalizedSprite'
   },
   properties: {
     spriteFrameSet: {
       default: [],
-      type: i
+      type: SpriteFrameSet
     }
   },
   onLoad: function () {

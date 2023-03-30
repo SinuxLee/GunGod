@@ -1,8 +1,9 @@
-const i = require('LanguageData')
+const LanguageData = require('LanguageData')
+
 cc.Class({
   extends: cc.Component,
   editor: {
-    executeInEditMode: !0,
+    executeInEditMode: true,
     menu: 'i18n/LocalizedLabel'
   },
   properties: {
@@ -17,13 +18,13 @@ cc.Class({
     _dataID: ''
   },
   onLoad: function () {
-    i.inst || i.init(), this.fetchRender()
+    LanguageData.inst || LanguageData.init(), this.fetchRender()
   },
   fetchRender: function () {
     const e = this.getComponent(cc.Label)
     if (e) return this.label = e, void this.updateLabel()
   },
   updateLabel: function () {
-    this.label ? i.t(this.dataID) && (this.label.string = i.t(this.dataID)) : cc.error('Failed to update localized label, label component is invalid!')
+    this.label ? LanguageData.t(this.dataID) && (this.label.string = LanguageData.t(this.dataID)) : cc.error('Failed to update localized label, label component is invalid!')
   }
 })

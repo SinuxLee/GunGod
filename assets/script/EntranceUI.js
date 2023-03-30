@@ -1,4 +1,5 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
+
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -9,8 +10,10 @@ cc.Class({
     mianfeitili: cc.Node,
     xinrenhaoli: cc.Node
   },
+
   onLoad: function () {
-    cc.systemEvent.on(i.UPDATE_HOVER_SHOW, this.initContent, this), this.strengthList = [{
+    cc.systemEvent.on(ModuleEventEnum.UPDATE_HOVER_SHOW, this.initContent, this)
+    this.strengthList = [{
       name: 'pop_icon_fc',
       desc: '添加浮窗得体力',
       type: 1,
@@ -36,33 +39,43 @@ cc.Class({
       act: '去邀请'
     }]
   },
+
   start: function () {
     this.initContent()
   },
+
   initData: function (e) {
     this.data = e
   },
+
   onEnable: function () {
     cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4
   },
+
   onDisable: function () {
     cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1
   },
+
   initContent: function () {
-    if (facade.getComponent('GameModel').checkHoverWinRewardShow() || this.strengthList.shift(), !facade.getComponent('GameModel').checkClientRewardShow()) {
+    facade.getComponent('GameModel').checkHoverWinRewardShow() || this.strengthList.shift()
+    if (!facade.getComponent('GameModel').checkClientRewardShow()) {
       const e = this.strengthList.length == 2 ? 0 : 1
       this.strengthList.splice(e, 1)
     }
+
     facade.getComponent('GameModel').lastFetchColectTime != 0 && this.cashList.splice(0, 1)
     const t = this.data == 1 ? this.strengthList : this.cashList
-    for (const n in this.mianfeitili.active = this.xinrenhaoli.active = !1, this.data == 1 ? this.mianfeitili.active = !0 : this.xinrenhaoli.active = !0, this.scroll.content.childrenCount != 0 && this.scroll.content.removeAllChildren(), t) {
+    for (const n in this.mianfeitili.active = this.xinrenhaoli.active = false, this.data == 1 ? this.mianfeitili.active = true : this.xinrenhaoli.active = true, this.scroll.content.childrenCount != 0 && this.scroll.content.removeAllChildren(), t) {
       const i = cc.instantiate(this.item)
-      i.getComponent('EntranceItem').setItemData(parseInt(n), t[n]), this.scroll.content.addChild(i)
+      i.getComponent('EntranceItem').setItemData(parseInt(n), t[n])
+      this.scroll.content.addChild(i)
     }
   },
+
   doClose: function () {
-    cc.systemEvent.off(i.UPDATE_HOVER_SHOW, this.initContent, this)
+    cc.systemEvent.off(ModuleEventEnum.UPDATE_HOVER_SHOW, this.initContent, this)
   },
+
   onClickBack: function () {
     popUp.getComponent('Pop').removeTop()
   }

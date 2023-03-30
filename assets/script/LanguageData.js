@@ -1,4 +1,3 @@
-const n = module.exports = {}
 const t = module
 
 const i = require('polyglot.min')
@@ -13,7 +12,7 @@ function s (e) {
     ? o.replace(e)
     : o = new i({
       phrases: e,
-      allowMissing: !0
+      allowMissing: true
     }))
 }
 window.i18n || (window.i18n = {

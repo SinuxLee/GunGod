@@ -4,18 +4,19 @@ function o (e, t, n) {
   return t in e
     ? Object.defineProperty(e, t, {
       value: n,
-      enumerable: !0,
-      configurable: !0,
-      writable: !0
+      enumerable: true,
+      configurable: true,
+      writable: true
     })
     : e[t] = n, e
 }
-const a = require('ModuleEventEnum')
-const s = require('Network')
+const ModuleEventEnum = require('ModuleEventEnum')
+const Network = require('Network')
+
 cc.Class((o(i = {
   extends: cc.Component,
   properties: {
-    isCPA: !1,
+    isCPA: false,
     maxCarTerm: 0,
     cpaGameTime: 0,
     boxGameTime: 0,
@@ -31,7 +32,9 @@ cc.Class((o(i = {
     const a = e.link_game_id
     const s = e.game_id
     if (wx.navigateToMiniProgram) {
-      this.callback = t, o = 'pages/index/index?' + o, console.log('lc 游戏跳转 : appId=', i, ', path=', o, ' extraData = ', e)
+      this.callback = t
+      o = 'pages/index/index?' + o
+      console.log('lc 游戏跳转 : appId=', i, ', path=', o, ' extraData = ', e)
       const c = this
       wx.navigateToMiniProgram({
         appId: i,
@@ -41,10 +44,15 @@ cc.Class((o(i = {
         path: o,
         envVersion: n ? 'develop' : 'release',
         success: function () {
-          console.log('lc 游戏跳转 : 成功'), c.sendTravelGame(a, s), t && t.success(), c.isCPA = !0
+          console.log('lc 游戏跳转 : 成功')
+          c.sendTravelGame(a, s)
+          t && t.success()
+          c.isCPA = true
         },
         fail: function () {
-          t && t.failure(), console.log('lc 游戏跳转 : 失败'), popUp.getComponent('Pop').getPopByName('FakeInterUI') || popUp.getComponent('Pop').addPopByName('FakeInterUI', null, !0)
+          t && t.failure()
+          console.log('lc 游戏跳转 : 失败')
+          popUp.getComponent('Pop').getPopByName('FakeInterUI') || popUp.getComponent('Pop').addPopByName('FakeInterUI', null, true)
         },
         complete: function () {}
       })
@@ -58,10 +66,15 @@ cc.Class((o(i = {
       final_to_game_id: t,
       token: window.facade.getComponent('PlayerModel').token
     }
-    window.net.getComponent('Net').httpRequest(window.net.NavigateOut, n), console.log('lc 跳转游戏-- 上报 行行行 ', t), window.net.getComponent('Net').appLinkReport(t)
+    window.net.getComponent('Net').httpRequest(window.net.NavigateOut, n)
+    console.log('lc 跳转游戏-- 上报 行行行 ', t)
+    window.net.getComponent('Net').appLinkReport(t)
   },
   onLoad: function () {
-    cc.systemEvent.on(a.GAMESENE_ENTERED, this.loadingEnd.bind(this)), cc.systemEvent.on(a.RELOGIN_SUCCESS, this.reLoginSuccess.bind(this)), cc.systemEvent.on(a.SERVER_RESPONSE, this.onServerResponse.bind(this)), this.monitorWXLifeCycle()
+    cc.systemEvent.on(ModuleEventEnum.GAMESENE_ENTERED, this.loadingEnd.bind(this))
+    cc.systemEvent.on(ModuleEventEnum.RELOGIN_SUCCESS, this.reLoginSuccess.bind(this))
+    cc.systemEvent.on(ModuleEventEnum.SERVER_RESPONSE, this.onServerResponse.bind(this))
+    this.monitorWXLifeCycle()
   },
   monitorWXLifeCycle: function () {
     if (facade.isMiniGame) {
@@ -91,7 +104,7 @@ cc.Class((o(i = {
           type: 3,
           content: this.boxReward.content
         }
-        window.popUp.getComponent('Pop').addPopByName('Prop', [n], !0)
+        window.popUp.getComponent('Pop').addPopByName('Prop', [n], true)
         break
       case 'Message_reward.SCResLinkRewardFetchedInfoMessage':
         console.log('lc cpa -- 已经领取信息 ', t.linkGameIds), this.callback.success(t.linkGameIds)
@@ -103,13 +116,15 @@ cc.Class((o(i = {
     else {
       if (e == 1) {
         const o = t
-        facade.getComponent('GameModel').requestUpGradeACar(o, 1), window.facade.getComponent('RewardBoxModel').carId = 0, console.log('lc cpa-- 开箱子', e, t)
-      } else e == 2 ? (window.facade.getComponent('RewardOnlineModel').requestOpenEgg(1), console.log('lc cpa-- 开箱子', e, t)) : e == 3 ? window.facade.getComponent('RewardSubsidyModel').freeMoneyFetch(1) : e == 4 && cc.systemEvent.emit(a.CAN_FREE_BUY_CAR, t)
+        facade.getComponent('GameModel').requestUpGradeACar(o, 1)
+        window.facade.getComponent('RewardBoxModel').carId = 0
+        console.log('lc cpa-- 开箱子', e, t)
+      } else e == 2 ? (window.facade.getComponent('RewardOnlineModel').requestOpenEgg(1), console.log('lc cpa-- 开箱子', e, t)) : e == 3 ? window.facade.getComponent('RewardSubsidyModel').freeMoneyFetch(1) : e == 4 && cc.systemEvent.emit(ModuleEventEnum.CAN_FREE_BUY_CAR, t)
       window.facade.getComponent('RewardCPAModel').getBoxGameRewardInfo({
         success: function (e) {
-          for (var t = !1, o = 0; o < e.length; o++) {
+          for (var t = false, o = 0; o < e.length; o++) {
             if (e[o] == n) {
-              t = !0
+              t = true
               break
             }
           } t == 0
@@ -123,7 +138,11 @@ cc.Class((o(i = {
     this.removeCPAReward()
   },
   saveCPAReward: function (e, t, n) {
-    cc.sys.localStorage.setItem('cpaGame', n), cc.sys.localStorage.setItem('cpaTime', this.clientTimeStamp()), cc.sys.localStorage.setItem('cpaType', e), t != null && cc.sys.localStorage.setItem('cpaContent', t), console.log('lc cpa-- 保存奖励', e, t)
+    cc.sys.localStorage.setItem('cpaGame', n)
+    cc.sys.localStorage.setItem('cpaTime', this.clientTimeStamp())
+    cc.sys.localStorage.setItem('cpaType', e)
+    t != null && cc.sys.localStorage.setItem('cpaContent', t)
+    console.log('lc cpa-- 保存奖励', e, t)
   },
   getCPAReward: function () {
     const e = cc.sys.localStorage.getItem('cpaGame')
@@ -133,27 +152,34 @@ cc.Class((o(i = {
     (console.log('lc cpa-- 获取奖励', t, n, i), t && t != '') ? (console.log('lc cpa 有奖励'), this.clientTimeStamp() - t < 1e3 * (n != 5 ? this.cpaGameTime : this.boxGameTime) ? (console.log('lc cpa 没有达到时间要求'), this.removeCPAReward()) : (console.log('lc cpa 达到时间要求, 领取奖励'), this.receiveCPAReward(n, i, e))) : (console.log('lc cpa 没有奖励'), this.removeCPAReward())
   },
   getBoxGameRewardInfo: function (e) {
-    this.callback = e, console.log('lc cpa 查询盒子奖励')
+    this.callback = e
+    console.log('lc cpa 查询盒子奖励')
   },
   getBoxGameReward: function (e) {
     console.log('lc cpa 领取盒子奖励')
   },
   removeCPAReward: function () {
-    cc.sys.localStorage.removeItem('cpaGame'), cc.sys.localStorage.removeItem('cpaTime'), cc.sys.localStorage.removeItem('cpaType'), cc.sys.localStorage.removeItem('cpaContent'), console.log('lc cap 移除奖励')
+    cc.sys.localStorage.removeItem('cpaGame')
+    cc.sys.localStorage.removeItem('cpaTime')
+    cc.sys.localStorage.removeItem('cpaType')
+    cc.sys.localStorage.removeItem('cpaContent')
+    console.log('lc cap 移除奖励')
   },
   clientTimeStamp: function () {
     return (new Date()).getTime()
   }
 }, 'clientTimeStamp', function () {
   return (new Date()).getTime()
-}), o(i, 'requestCPAGame', function (e) {
+}),
+
+o(i, 'requestCPAGame', function (e) {
   const t = window.facade.httpServerAdress + window.net.RecommendGame
   const n = {
     game_id: window.facade.GameId,
     token: window.facade.getComponent('PlayerModel').token
   }
   const i = this
-  s.postReq(t, n, {
+  Network.postReq(t, n, {
     success: function (t) {
       const n = i.setupRecommendList(t.recommend_info)
       e.success(n)
@@ -162,7 +188,9 @@ cc.Class((o(i = {
       e.success(null)
     }
   })
-}), o(i, 'setupRecommendList', function (e) {
+}),
+
+o(i, 'setupRecommendList', function (e) {
   for (var t = [], n = 0; n < e.length; n++) {
     const i = e[n]
     parseInt(i.group) == 5 && t.push(i)
@@ -180,15 +208,22 @@ cc.Class((o(i = {
   }
   r = parseInt(Math.random() * a.length)
   return console.log('lc cpa random clickParams = ', r, a.length), a[r]
-}), o(i, 'initConfig', function () {
-  for (const e in this.globalDB = cc.loader.getRes('config/GlobalDB'), this.globalDB) {
+}),
+
+o(i, 'initConfig', function () {
+  this.globalDB = cc.loader.getRes('config/GlobalDB')
+  for (const e in this.globalDB) {
     if (e == '47104') {
       const t = this.globalDB[e].value.split('|')
-      this.headOrderIds = t[0].split(':')[1].split(','), this.loopOrderIds = t[0].split(':')[1].split(',')
+      this.headOrderIds = t[0].split(':')[1].split(',')
+      this.loopOrderIds = t[0].split(':')[1].split(',')
     }
     if (e == '47201' && (this.maxCarTerm = parseInt(this.globalDB[e].value), console.log('lc cpa-- maxCarTerm = ', this.maxCarTerm)), e == '47202' && (this.cpaGameTime = parseInt(this.globalDB[e].value), console.log('lc cpa-- cpaGameTime = ', this.cpaGameTime)), e == '47203' && (this.resourceMarkup = parseInt(this.globalDB[e].value), console.log('lc cpa-- resourceMarkup = ', this.resourceMarkup)), e == '47204' && (this.carMarkup = parseInt(this.globalDB[e].value), console.log('lc cpa-- carMarkup = ', this.carMarkup)), e == '47301') {
       const n = this.globalDB[e].value
-      this.boxReward = {}, this.boxReward.type = n.split(':')[0], this.boxReward.content = n.split(':')[1], console.log('lc cpa-- boxReward = ', this.boxReward)
+      this.boxReward = {}
+      this.boxReward.type = n.split(':')[0]
+      this.boxReward.content = n.split(':')[1]
+      console.log('lc cpa-- boxReward = ', this.boxReward)
     }
     e == '47302' && (this.boxGameTime = parseInt(this.globalDB[e].value), console.log('lc cpa-- boxGameTime = ', this.boxGameTime))
   }

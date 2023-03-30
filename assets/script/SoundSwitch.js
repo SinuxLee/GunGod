@@ -4,12 +4,14 @@ cc.Class({
     skinOn: cc.SpriteFrame,
     skinOff: cc.SpriteFrame
   },
+
   onLoad: function () {
-    this._soundSwitch = !0
+    this._soundSwitch = true
     const e = cc.sys.localStorage.getItem('Shooter_Sound')
-    this._soundSwitch = !e || e == 'true', this.updateStatus()
+    this._soundSwitch = !e || e == 'true'
+    this.updateStatus()
   },
-  start: function () {},
+
   trigger: function () {
     if (facade.FOR_DEVELOP) {
       const e = {
@@ -38,9 +40,11 @@ cc.Class({
     const i = this._soundSwitch ? 'true' : 'false'
     cc.sys.localStorage.setItem('Shooter_Sound', i)
   },
+
   updateStatus: function () {
     audio.getComponent('SoundManager').setSoundEnabled(this._soundSwitch)
   },
+
   update: function (e) {
     this.node.getComponent(cc.Sprite).spriteFrame = this._soundSwitch ? this.skinOn : this.skinOff
   }

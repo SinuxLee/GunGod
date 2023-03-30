@@ -1,4 +1,4 @@
-const i = require('Network')
+const Network = require('Network')
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -14,12 +14,19 @@ cc.Class({
     window.net.getComponent('Net').httpRequest(window.net.NavigateOut, i), e == 1 ? this.requestHomeRecommend() : (this.requestRecommendGame(), this.requestHomeRecommend())
   },
   showRecommendGameList: function (e) {
-    this.node.opacity = 255, this.node.active = !0, this.content.x = 0, this.content.removeAllChildren()
+    this.node.opacity = 255
+    this.node.active = true
+    this.content.x = 0
+    this.content.removeAllChildren()
     for (let t = 0; t < e.length; t++) {
       let n = null;
-      (n = cc.instantiate(this.itemPrefab)).x = 134 * t + 67, n.active = !0, n.getComponent('RecommendGameItem').setupItemData(e[t]), this.content.addChild(n)
+      (n = cc.instantiate(this.itemPrefab)).x = 134 * t + 67
+      n.active = true
+      n.getComponent('RecommendGameItem').setupItemData(e[t])
+      this.content.addChild(n)
     }
-    this.content.width = 134 * e.length, this.content.width <= this.node.width - 40 ? this.isOpen = !1 : (this.isOpen = !0, this.isLeft = !0)
+    this.content.width = 134 * e.length
+    this.content.width <= this.node.width - 40 ? this.isOpen = false : (this.isOpen = true, this.isLeft = true)
   },
   requestHomeRecommend: function () {
     const e = this
@@ -28,7 +35,7 @@ cc.Class({
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token
     }
-    i.postRequest(t, n, {
+    Network.postRequest(t, n, {
       success: function (t) {
         const n = facade.getComponent('PlayerModel').getRecommondCount()
         const i = e.setupRecommendList(t.recommend_info, n, 3, [])
@@ -44,7 +51,7 @@ cc.Class({
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token
     }
-    i.postRequest(t, n, {
+    Network.postRequest(t, n, {
       success: function (t) {
         const n = e.setupRecommendList(t.recommend_info, 50, 5, [])
         cc.systemEvent.emit(ME.RESULT_RECOMMEND, n)
@@ -59,7 +66,7 @@ cc.Class({
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token
     }
-    i.postRequest(t, n, {
+    Network.postRequest(t, n, {
       success: function (t) {
         const n = e.setupRecommendList(t.recommend_info, 4, 4, [])
         cc.systemEvent.emit(ME.RECOMMEND_GAME, n)

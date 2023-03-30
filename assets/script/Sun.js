@@ -1,9 +1,8 @@
 cc.Class({
   extends: cc.Component,
-  properties: {},
-  onLoad: function () {},
+
   start: function () {
-    this.node.active = !1
+    this.node.active = false
   },
   update: function (e) {
     this.node.angle += 10

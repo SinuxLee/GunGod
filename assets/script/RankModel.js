@@ -1,13 +1,14 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
+
 cc.Class({
   extends: cc.Component,
-  properties: {},
+
   onLoad: function () {
-    cc.systemEvent.on(i.GOT_HTTP_RES, this.httpResDeal.bind(this))
+    cc.systemEvent.on(ModuleEventEnum.GOT_HTTP_RES, this.httpResDeal.bind(this))
   },
   httpResDeal: function (e) {
     const t = e.data
-    t && t.nick_name ? (this.selfdata = t, cc.systemEvent.emit(i.PLAYER_RANK_DATA, this.selfdata)) : t && t[0] && t[0].best_score ? (this.ranks = t, cc.systemEvent.emit(i.RANK_LIST, this.ranks)) : t && t[0] && t[0].today_best_score && (this.ranks = t, cc.systemEvent.emit(i.RANK_LIST, this.ranks))
+    t && t.nick_name ? (this.selfdata = t, cc.systemEvent.emit(ModuleEventEnum.PLAYER_RANK_DATA, this.selfdata)) : t && t[0] && t[0].best_score ? (this.ranks = t, cc.systemEvent.emit(ModuleEventEnum.RANK_LIST, this.ranks)) : t && t[0] && t[0].today_best_score && (this.ranks = t, cc.systemEvent.emit(ModuleEventEnum.RANK_LIST, this.ranks))
   },
   requestRankList: function (e) {
     let t = 1

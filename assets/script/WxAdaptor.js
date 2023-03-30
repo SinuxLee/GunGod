@@ -1,25 +1,51 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
-  properties: {},
+
   onLoad: function () {
-    cc.systemEvent.on(i.GOT_HTTP_RES, this.httpResDeal.bind(this)), window.facade.windowWidth = 375, window.facade.windowHeight = 667, facade.isMiniGame && wx.wxOnShowRes && (this._onShowData = wx.wxOnShowRes, wx.wxOnShowRes = null, this.openToService = !1), this.initListener(), this.initVersionLinstener(), facade.isMiniGame && (wx.showShareMenu({
-      withShareTicket: !0
-    }), wx.setKeepScreenOn({
-      keepScreenOn: !0
-    }), wx.getSystemInfo({
+    cc.systemEvent.on(ModuleEventEnum.GOT_HTTP_RES, this.httpResDeal.bind(this))
+    window.facade.windowWidth = 375
+    window.facade.windowHeight = 667
+    facade.isMiniGame && wx.wxOnShowRes && (this._onShowData = wx.wxOnShowRes, wx.wxOnShowRes = null, this.openToService = false)
+    this.initListener()
+    this.initVersionLinstener()
+    
+    if(acade.isMiniGame) {
+      wx.showShareMenu({
+      withShareTicket: true
+    })
+    
+    wx.setKeepScreenOn({
+      keepScreenOn: true
+    })
+    
+    wx.getSystemInfo({
       success: function (e) {
-        if (window.facade.PhoneInfo = e, window.facade.windowWidth = e.windowWidth, window.facade.windowHeight = e.windowHeight, window.facade.Screenratio = Number(e.windowWidth) / Number(e.windowHeight), window.facade.screenWidth = 640, window.facade.screenHeight = 640 / window.facade.Screenratio, window.facade.isIOS = e.system.match('iOS') != null, canvas.width = e.screenWidth * e.pixelRatio, canvas.height = e.screenHeight * e.pixelRatio, console.log('phoneinfo----------------\x3e', window.facade.PhoneInfo), window.facade.isIOS) {
-          if ((t = e.model.split('')).length >= 2 && t[1].match('s') != null) Number(t[1][0]) < 6 && (window.facade.deviceLow = !0)
+        window.facade.PhoneInfo = e
+        window.facade.windowWidth = e.windowWidth
+        window.facade.windowHeight = e.windowHeight
+        window.facade.Screenratio = Number(e.windowWidth) / Number(e.windowHeight)
+        window.facade.screenWidth = 640
+        window.facade.screenHeight = 640 / window.facade.Screenratio
+        window.facade.isIOS = e.system.match('iOS') != null
+        canvas.width = e.screenWidth * e.pixelRatio
+        canvas.height = e.screenHeight * e.pixelRatio
+        console.log('phoneinfo----------------\x3e', window.facade.PhoneInfo)
+        
+        if (window.facade.isIOS) {
+          if ((t = e.model.split('')).length >= 2 && t[1].match('s') != null) Number(t[1][0]) < 6 && (window.facade.deviceLow = true)
           else if (t[1] != 'X') {
-            Number(t[1][0]) <= 6 && (window.facade.deviceLow = !0)
+            Number(t[1][0]) <= 6 && (window.facade.deviceLow = true)
           }
         } else {
           var t = e.system.replace('Android ', '')
-          Number(t.split('.')[0]) < 6 && (window.facade.deviceLow = !0)
+          Number(t.split('.')[0]) < 6 && (window.facade.deviceLow = true)
         }
       }
-    }), this.setSharedCancas(), this.login())
+    })
+    this.setSharedCancas()
+    this.login()
+  }
   },
   setSharedCancas: function (e) {
     try {
@@ -33,7 +59,15 @@ cc.Class({
     facade.isMiniGame && window.facade.isEnabledVideoAd && this.createVideo()
   },
   init: function (e) {
-    this._model = e, this.wxCode = null, this.wxUserInfo = null, this.wxSignature = null, this.wxEncryptedData = null, this.wxRawData = null, this.wxIv = null, this.loginDatas = {
+    this._model = e
+    this.wxCode = null
+    this.wxUserInfo = null
+    this.wxSignature = null
+    this.wxEncryptedData = null
+    this.wxRawData = null
+    this.wxIv = null
+    
+    this.loginDatas = {
       boxId: 24,
       secret: 'f3d7964d586629c82bddb22b65c32b3d',
       boxUid: 0,
@@ -42,13 +76,17 @@ cc.Class({
       actId: 0,
       chanId: 0,
       subCid: 0
-    }, this.behaveReportDatas = {
+    }
+    
+    this.behaveReportDatas = {
       openid: 0,
       actId: 0,
       platform: 0,
       chan: 0,
       subChan: 0
-    }, this.appLinkReportDatas = {
+    }
+    
+    this.appLinkReportDatas = {
       gmId: 91,
       objGmId: 0,
       openid: 0,
@@ -60,10 +98,12 @@ cc.Class({
     this.login()
   },
   relogin: function () {
-    console.log('do relogin()...'), this.needRelogin = !0, this.login()
+    console.log('do relogin()...')
+    this.needRelogin = true, this.login()
   },
   login: function () {
-    console.log('login: function () {...'), wx.login({
+    console.log('login: function () {...')
+    wx.login({
       success: function (e) {
         this.wxCode = e.code
       }.bind(this),
@@ -75,7 +115,8 @@ cc.Class({
   loginWithoutUser: function () {
     window.net.platformName == 'swan' && wx.getSwanId({
       success: function (e) {
-        this.baidu_swanid = e.data.swanid, this.baidu_swanid_sign = e.data.swanid_signature
+        this.baidu_swanid = e.data.swanid
+        this.baidu_swanid_sign = e.data.swanid_signature
       }.bind(this),
       complete: function () {
         this.loginServer()
@@ -83,12 +124,13 @@ cc.Class({
     })
   },
   wxGetUserInfo: function () {
-    this.isNewGetInfoApi = !0, wx.getSetting && wx.getSetting({
+    this.isNewGetInfoApi = true
+    wx.getSetting && wx.getSetting({
       success: function (e) {
         const t = e.authSetting
-        !0 === t['scope.userInfo']
+        true === t['scope.userInfo']
           ? (console.log('用户已经授权，可以获取用户信息'), this.getUserInfoOldApi())
-          : !1 === t['scope.userInfo']
+          : false === t['scope.userInfo']
               ? (console.log('用户已拒绝授权, 需要引导用户到设置页面打开授权开关'), wx.showModal({
                   title: '请授权',
                   content: '授权页面的进入路径为：\n右上角菜单->关于->右上角菜单->设置',
@@ -141,12 +183,16 @@ cc.Class({
     })
   },
   recordUserData: function (e) {
-    this.wxUserInfo = e.userInfo, this._model.platUserInfo = e.userInfo, this._model.recordRoleProfile()
+    this.wxUserInfo = e.userInfo
+    this._model.platUserInfo = e.userInfo
+    this._model.recordRoleProfile()
   },
   setUserData: function (t) {
-    window.facade.WXInfoButton && (window.facade.WXInfoButton.hide(), window.facade.WXInfoButton.destroy(), window.facade.WXInfoButton = null), this.wxUserInfo = t.userInfo, this._model.platUserInfo = t.userInfo, this.wxSignature = t.signature, this.wxEncryptedData = t.encryptedData, this.wxRawData = t.rawData, this.wxIv = t.iv, window.facade.isEnteredGame = !0
+    window.facade.WXInfoButton && (window.facade.WXInfoButton.hide(), window.facade.WXInfoButton.destroy(), window.facade.WXInfoButton = null), this.wxUserInfo = t.userInfo, this._model.platUserInfo = t.userInfo, this.wxSignature = t.signature, this.wxEncryptedData = t.encryptedData, this.wxRawData = t.rawData, this.wxIv = t.iv, window.facade.isEnteredGame = true
     const n = require('ModuleEventEnum')
-    cc.systemEvent.emit(n.USER_INFO_ALLOWED), this._model.recordRoleProfile(), cc.systemEvent.emit(n.ENTER_AGREED)
+    cc.systemEvent.emit(n.USER_INFO_ALLOWED)
+    this._model.recordRoleProfile()
+    cc.systemEvent.emit(n.ENTER_AGREED)
   },
   getWxScene: function () {
     if (this._onShowData && this._onShowData.scene) return this._onShowData.scene
@@ -155,7 +201,8 @@ cc.Class({
   },
   checkBroadcastReward: function () {
     const e = wx.getLaunchOptionsSync()
-    console.log('checkBroadcastReward:', e), e.query.lsreward == 'Gongzhonghao' && (facade.fromBroadcast = !0)
+    console.log('checkBroadcastReward:', e)
+    e.query.lsreward == 'Gongzhonghao' && (facade.fromBroadcast = true)
   },
   getAdScource: function () {
     if (facade.isMiniGame) {
@@ -174,12 +221,12 @@ cc.Class({
       title: '警告',
       content: '拒绝授权将无法正常游戏',
       cancelText: '取消',
-      showCancel: !0,
+      showCancel: true,
       confirmText: '设置',
       success: function (e) {
         e.confirm && wx.openSetting({
           success: function (e) {
-            !0 === e.authSetting['scope.userInfo'] && (console.log('openSetting userInfo----------------------\x3e', e), this.getUserInfoOldApi())
+            true === e.authSetting['scope.userInfo'] && (console.log('openSetting userInfo----------------------\x3e', e), this.getUserInfoOldApi())
           }.bind(this)
         })
       }.bind(this)
@@ -195,21 +242,39 @@ cc.Class({
       },
       method: 'POST',
       success: function (t) {
-        e._model.userId = t.data.data.openid, cc.systemEvent.emit(i.WX_REGISTERED)
+        e._model.userId = t.data.data.openid
+        cc.systemEvent.emit(ModuleEventEnum.WX_REGISTERED)
       }
     })
   },
   httpResDeal: function (e) {
     const t = e.data
     if (t && (console.log(JSON.stringify(t)), t && t.user_id && t.token && t.open_id)) {
-      if (this._model.userId = t.token, this._model.privateUid = t.user_id, this._model.token = t.token, this._model.gameGate = t.game_gate, this._model.userState = t.user_state, this.openId = this._model.openId = t.open_id, window.facade.token = this._model.token, window.facade.openId = this._model.openId, window.facade.userId = t.user_id, window.facade.channel_id = t.channel_id, window.facade.channel_sub = t.channel_sub, window.net.getComponent('Net').behaveReport(1001), window.net.getComponent('Net').behaveReport(1002), window.net.getComponent('Net').behaveReport(1), facade.isMiniGame) {
+      this._model.userId = t.token
+      this._model.privateUid = t.user_id
+      this._model.token = t.token
+      this._model.gameGate = t.game_gate
+      this._model.userState = t.user_state
+      this.openId = this._model.openId = t.open_id
+      window.facade.token = this._model.token
+      window.facade.openId = this._model.openId
+      window.facade.userId = t.user_id
+      window.facade.channel_id = t.channel_id
+      window.facade.channel_sub = t.channel_sub
+      window.net.getComponent('Net').behaveReport(1001)
+      window.net.getComponent('Net').behaveReport(1002)
+      window.net.getComponent('Net').behaveReport(1)
+      if (facade.isMiniGame) {
         const n = wx.getLaunchOptionsSync()
-        console.log('lc====== launchData1 :', n), n.query && n.query.id && window.net.getComponent('Net').behaveReport(8)
+        console.log('lc====== launchData1 :', n)
+        n.query && n.query.id && window.net.getComponent('Net').behaveReport(8)
       }
       if (this.needRelogin) {
-        this.needRelogin = !1
+        this.needRelogin = false
         const i = {}
-        i.game_id = window.facade.GameId, i.token = this._model.token, window.net.getComponent('Net').httpRequest(window.net.ServerInfo, i)
+        i.game_id = window.facade.GameId
+        i.token = this._model.token
+        window.net.getComponent('Net').httpRequest(window.net.ServerInfo, i)
       }
     }
   },
@@ -218,24 +283,41 @@ cc.Class({
       if (void 0 == wx || wx) {
         if (!wx.getUpdateManager) return
         wx.getUpdateManager().onCheckForUpdate(function (e) {
-          console.log('hasUpdate', e.hasUpdate), e.hasUpdate && window.popUp.getComponent('Pop').addAlert('当前游戏程序不是最新版本，这可能会造成部分功能体验不畅。代码自行更新完成后会提醒您哦！', null, !1)
-        }), wx.getUpdateManager().onUpdateReady(function () {
+          console.log('hasUpdate', e.hasUpdate)
+          e.hasUpdate && window.popUp.getComponent('Pop').addAlert('当前游戏程序不是最新版本，这可能会造成部分功能体验不畅。代码自行更新完成后会提醒您哦！', null, false)
+        })
+        
+        wx.getUpdateManager().onUpdateReady(function () {
           wx.getUpdateManager().applyUpdate()
-        }), wx.getUpdateManager().onUpdateFailed(function () {})
+        })
+        wx.getUpdateManager().onUpdateFailed(function () {})
       }
     } catch (e) {}
   },
   checkTicket: function (e) {
-    e.query && e.query.id && window.net.getComponent('Net').behaveReport(window.facade.BEHAVE_FORM_SHARE), window.facade.canShowShareGroup == 1 ? e.shareTicket && e.sessionid != window.facade.lastSessionid && (window.facade.showShareTicket = e.shareTicket, window.facade.lastSessionid = e.sessionid) : window.facade.canShowShareGroup = !0
+    e.query && e.query.id && window.net.getComponent('Net').behaveReport(window.facade.BEHAVE_FORM_SHARE)
+    window.facade.canShowShareGroup == 1 ? e.shareTicket && e.sessionid != window.facade.lastSessionid && (window.facade.showShareTicket = e.shareTicket, window.facade.lastSessionid = e.sessionid) : window.facade.canShowShareGroup = true
   },
   reEnter: function () {
-    window.facade.reEnter = !0, cc.systemEvent.emit(i.RE_ENTERED)
+    window.facade.reEnter = true
+    cc.systemEvent.emit(ModuleEventEnum.RE_ENTERED)
   },
   initListener: function () {
     try {
       (void 0 == wx || wx) && (wx.onShow(function (e) {
-        if (console.log('lc wxAdaptor ============wx.onShow==========query =', e.query), console.log(e), e.query.id && (window.facade.queryRoleID = e.query.id), this.checkTicket(e), window.facade.isShareOut == 1 ? window.facade.isShareOut = !1 : (window.facade.isEnterGameFirst = !0, this.reEnter()), this._onShowData = e, this._registerList) { for (let t = 0; t < this._registerList.length;) this._registerList[t].callback(), this._registerList[t].once ? this._registerList.splice(t, 1) : t++ }
-        e.query.lsreward == 'Gongzhonghao' && (facade.fromBroadcast = !0)
+        console.log('lc wxAdaptor ============wx.onShow==========query =', e.query)
+        console.log(e)
+        e.query.id && (window.facade.queryRoleID = e.query.id)
+        this.checkTicket(e)
+        window.facade.isShareOut == 1 ? window.facade.isShareOut = false : (window.facade.isEnterGameFirst = true, this.reEnter())
+        this._onShowData = e
+        if (this._registerList) { 
+          for (let t = 0; t < this._registerList.length;) {
+            this._registerList[t].callback()
+            this._registerList[t].once ? this._registerList.splice(t, 1) : t++
+          }
+        }
+        e.query.lsreward == 'Gongzhonghao' && (facade.fromBroadcast = true)
       }.bind(this)), wx.onHide(function (e) {
         console.log('wx.onHide==========')
       }))
@@ -243,12 +325,13 @@ cc.Class({
   },
   checkIsDebug: function () {
     if (__wxConfig.envVersion) {
-      switch (console.log('__wxConfig.envVersion is :', __wxConfig.envVersion), __wxConfig.envVersion) {
+      console.log('__wxConfig.envVersion is :', __wxConfig.envVersion)
+      switch (__wxConfig.envVersion) {
         case 'develop':
-          return !0
+          return true
         case 'trial':
         case 'release':
-          return !1
+          return false
       }
     }
   },
@@ -272,7 +355,8 @@ cc.Class({
     return e.query && e.query.inviteType ? e.query.inviteType : 0
   },
   getInviteId: function () {
-    if (console.log('getInviteId:', wx.getLaunchOptionsSync()), this._onShowData && this._onShowData.query && this._onShowData.query.inviteId) return this._onShowData.query.inviteId
+    console.log('getInviteId:', wx.getLaunchOptionsSync())
+    if (this._onShowData && this._onShowData.query && this._onShowData.query.inviteId) return this._onShowData.query.inviteId
     const e = wx.getLaunchOptionsSync()
     return e.query && e.query.inviteId ? e.query.inviteId : 0
   },
@@ -333,17 +417,21 @@ cc.Class({
     return 0
   },
   isCanShowVideo: function () {
-    let e = !1
+    let e = false
     if (facade.isMiniGame) {
-      const t = wx.getSystemInfoSync().SDKVersion; this.compareVersion(t, '2.0.4') === -1 ? console.log('=====版本不够2.0.4，视频广告不能用') : e = !0
+      const t = wx.getSystemInfoSync().SDKVersion
+      this.compareVersion(t, '2.0.4') === -1 ? console.log('=====版本不够2.0.4，视频广告不能用') : e = true
     }
     return e
   },
   createVideo: function (e) {},
   loadVideo: function (e) {
     const t = this
-    if (!this.isCanShowVideo()) return window.popUp.getComponent('FloatTip').showTip('微信版本过低无法加载广告'), void (window.facade.isEnabledVideoAd = !1)
-    this.entrance = e, window.facade.getComponent('UserModel').starVideo(e), window.audio.getComponent('SoundManager').isPlayingBgm && window.audio.getComponent('SoundManager')._soundActive && (this.videoPauseBGM = !0, window.audio.getComponent('SoundManager').pauseBGM()), facade.isMiniGame && this.videoAd.load().then(function () {
+    if (!this.isCanShowVideo()) return window.popUp.getComponent('FloatTip').showTip('微信版本过低无法加载广告'), void (window.facade.isEnabledVideoAd = false)
+    this.entrance = e
+    window.facade.getComponent('UserModel').starVideo(e)
+    window.audio.getComponent('SoundManager').isPlayingBgm && window.audio.getComponent('SoundManager')._soundActive && (this.videoPauseBGM = true, window.audio.getComponent('SoundManager').pauseBGM())
+    facade.isMiniGame && this.videoAd.load().then(function () {
       return t.videoAd.show().catch(function (e) {
         return console.log(e)
       })
@@ -360,7 +448,7 @@ cc.Class({
     }
   },
   checkCollectCondi: function () {
-    if (window.wx == null) return !1
+    if (window.wx == null) return false
     const e = wx.getSystemInfoSync().SDKVersion
     const t = this.compareVersion(e, '2.2.4')
     const n = this.getWxScene()
@@ -372,7 +460,9 @@ cc.Class({
   reigsterWXFunc: function (e, t) {
     this._registerList = this._registerList || []
     const n = {}
-    n.callback = e, n.once = t, this._registerList.push(n)
+    n.callback = e
+    n.once = t
+    this._registerList.push(n)
   },
   checkInterstitialAd: function () {
     return !(facade.SAVE_MODE || !facade.isMiniGame) && this.compareVersion(null, '2.6.0') >= 0
@@ -383,17 +473,16 @@ cc.Class({
   getClientReward: function () {
     const e = this
     wx.openCustomerServiceConversation({
-      showMessageCard: !0,
+      showMessageCard: true,
       sendMessageTitle: '',
       sendMessagePath: '',
       sendMessageImg: '',
       success: function (t) {
-        e.openToService = !0
+        e.openToService = true
       },
       fail: function (t) {
-        e.openToService = !1
+        e.openToService = false
       }
     }), net.getComponent('Net').behaveReport(facade.BEHAVE_OPENSERVICE)
-  },
-  update: function (e) {}
+  }
 })

@@ -4,14 +4,16 @@ function o (e, t, n) {
   return t in e
     ? Object.defineProperty(e, t, {
       value: n,
-      enumerable: !0,
-      configurable: !0,
-      writable: !0
+      enumerable: true,
+      configurable: true,
+      writable: true
     })
     : e[t] = n, e
 }
-const a = require('ModuleEventEnum')
+
+const ModuleEventEnum = require('ModuleEventEnum')
 require('CommonFunc')
+
 cc.Class((o(i = {
   extends: cc.Component,
   properties: {
@@ -40,7 +42,7 @@ cc.Class((o(i = {
     window.facade.getComponent('GameModel').rewardEnergy(this.addValue), popUp.getComponent('FloatTip').showTip('收获体力 x ' + this.addValue), window.popUp.getComponent('Pop').removeTop()
   }
 }, 'onDisable', function () {
-  cc.systemEvent.emit(a.BACK_ENERGY_CLOSED), window.facade.getComponent('BannerModel').hideBanner()
+  cc.systemEvent.emit(ModuleEventEnum.BACK_ENERGY_CLOSED), window.facade.getComponent('BannerModel').hideBanner()
 }), o(i, 'comfirm', function () {
   if (!facade.isMiniGame) return window.facade.getComponent('GameModel').rewardEnergy(2 * this.addValue), popUp.getComponent('FloatTip').showTip('收获体力 x ' + 2 * this.addValue), void window.popUp.getComponent('Pop').removeTop()
   const e = {

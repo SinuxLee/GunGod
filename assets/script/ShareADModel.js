@@ -1,23 +1,40 @@
-const i = require('ModuleEventEnum')
-require('Network'), require('AlertTool')
+const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
   properties: {},
   onLoad: function () {
-    this.dayId = 1, this.shareCount = 0, this.videoCount = 0, this.loginCount = 1, this.dayShareADCount = 0, this.dayShareCount = 0, this.dayADCount = 0, this.lastLoginTime = this.getLocalTime(), this.shareInterval = 500, this.shareOpen = !0, this.initConfig(), facade.isMiniGame && (cc.systemEvent.on(i.WX_REGISTERED, this.onWxRegistered, this), cc.systemEvent.on(i.GOT_HTTP_RES, this.httpResDeal2.bind(this)), cc.systemEvent.on(i.WX_SHOW, this.onWxShow.bind(this)), cc.systemEvent.on(i.WX_HIDE, this.onWxHide.bind(this)))
+    this.dayId = 1
+    this.shareCount = 0
+    this.videoCount = 0
+    this.loginCount = 1
+    this.dayShareADCount = 0
+    this.dayShareCount = 0
+    this.dayADCount = 0
+    this.lastLoginTime = this.getLocalTime()
+    this.shareInterval = 500
+    this.shareOpen = true
+    this.initConfig()
+    if (facade.isMiniGame) {
+      cc.systemEvent.on(ModuleEventEnum.WX_REGISTERED, this.onWxRegistered, this)
+      cc.systemEvent.on(ModuleEventEnum.GOT_HTTP_RES, this.httpResDeal2.bind(this))
+      cc.systemEvent.on(ModuleEventEnum.WX_SHOW, this.onWxShow.bind(this))
+      cc.systemEvent.on(ModuleEventEnum.WX_HIDE, this.onWxHide.bind(this))
+    }
   },
   initConfig: function () {
     cc.loader.loadResArray(['config/ASOrderConfig', 'config/ASRuleConfig', 'config/GameConfig'], cc.JsonAsset, this.configLoaded.bind(this))
   },
   httpResDeal2: function (e) {
     let t;
-    (e = e.data) && e.invite_newbie && (this.newerCount = e.invite_newbie.length, this.newbieList = e.invite_newbie, this.newbieList && this.newbieList.length > 1 && (t = this.sortList(this.newbieList, 'newbieFetchList')), this.generateOrder(), cc.systemEvent.emit(i.GAME_OPEN_NEWBIE_INVITE, t))
-    e && e.invite_alive && (this.activityCount = e.invite_alive.length, this.activityList = e.invite_alive, this.generateOrder(), cc.systemEvent.emit(i.GAME_OPEN_DAILY_INVITE, this.activityList))
+    (e = e.data) && e.invite_newbie && (this.newerCount = e.invite_newbie.length, this.newbieList = e.invite_newbie, this.newbieList && this.newbieList.length > 1 && (t = this.sortList(this.newbieList, 'newbieFetchList')), this.generateOrder(), cc.systemEvent.emit(ModuleEventEnum.GAME_OPEN_NEWBIE_INVITE, t))
+    e && e.invite_alive && (this.activityCount = e.invite_alive.length, this.activityList = e.invite_alive, this.generateOrder(), cc.systemEvent.emit(ModuleEventEnum.GAME_OPEN_DAILY_INVITE, this.activityList))
   },
   httpResDeal: function (e) {
     if (e && e.record) {
       const t = JSON.parse(e.record)
-      console.log('ShareADModel data:', t), this.dayCheck(t), this.saveRecord()
+      console.log('ShareADModel data:', t)
+      this.dayCheck(t)
+      this.saveRecord()
     }
   },
   sortList: function (e, t) {
@@ -34,19 +51,38 @@ cc.Class({
     return e.getTime() - 6e4 * e.getTimezoneOffset()
   },
   dayCheck: function (e) {
-    this.lastLoginTime = Number(e.lastLoginTime), this.dayId = Number(e.dayId), this.loginCount = Number(e.loginCount), this.dayADCount = Number(e.dayADCount), this.dayShareCount = Number(e.dayShareCount), this.dayShareADCount = Number(e.dayShareADCount), this.shareCount = Number(e.shareCount), this.videoCount = Number(e.videoCount)
+    this.lastLoginTime = Number(e.lastLoginTime)
+    this.dayId = Number(e.dayId)
+    this.loginCount = Number(e.loginCount)
+    this.dayADCount = Number(e.dayADCount)
+    this.dayShareCount = Number(e.dayShareCount)
+    this.dayShareADCount = Number(e.dayShareADCount)
+    this.shareCount = Number(e.shareCount)
+    this.videoCount = Number(e.videoCount)
     const t = this.getLocalTime()
     const n = Math.floor(this.lastLoginTime / 86400 / 1e3)
     const o = Math.floor(t / 86400 / 1e3)
     const a = new Date(86400 * o * 1e3)
     const s = new Date(86400 * n * 1e3)
-    console.log('lastDay:', s.toString()), console.log('today:', a.toString()), console.log('day check:', n, '----------', o), n < o && (this.dayId++, this.dayADCount = 0, this.dayShareCount = 0, this.dayShareADCount = 0), this.lastLoginTime = t, this.loginCount++, this.generateOrder(), cc.systemEvent.emit(i.LOGININFO_GOT)
+    console.log('lastDay:', s.toString())
+    console.log('today:', a.toString())
+    console.log('day check:', n, '----------', o)
+    n < o && (this.dayId++, this.dayADCount = 0, this.dayShareCount = 0, this.dayShareADCount = 0)
+    this.lastLoginTime = t
+    this.loginCount++
+    this.generateOrder()
+    cc.systemEvent.emit(ModuleEventEnum.LOGININFO_GOT)
   },
   generateOrder: function () {
     if (this.GameConfig) {
       this.activityCount || (this.activityCount = 0), this.newerCount || (this.newerCount = 0)
       let e = this.dayId - 1
-      if (e < 1 && (e = 1), this.videoFactor = this.videoCount / e, this.newerFactor = this.newerCount / e, this.activityFactor = this.activityCount / e, this.shareFactor = this.newerFactor * Number(this.GameConfig.NewerValue.Value) / 100 + this.activityFactor * Number(this.GameConfig.OnlineValue.Value) / 100, this.dayId == 1) this.headOrderIds = this.GameConfig['Day_' + this.dayId + '_AS_Order'].Value.split(':')[0].split(','), this.loopOrderIds = this.GameConfig['Day_' + this.dayId + '_AS_Order'].Value.split(':')[1].split(',')
+      e < 1 && (e = 1)
+      this.videoFactor = this.videoCount / e
+      this.newerFactor = this.newerCount / e
+      this.activityFactor = this.activityCount / e
+      this.shareFactor = this.newerFactor * Number(this.GameConfig.NewerValue.Value) / 100 + this.activityFactor * Number(this.GameConfig.OnlineValue.Value) / 100
+      if (this.dayId == 1) this.headOrderIds = this.GameConfig['Day_' + this.dayId + '_AS_Order'].Value.split(':')[0].split(','), this.loopOrderIds = this.GameConfig['Day_' + this.dayId + '_AS_Order'].Value.split(':')[1].split(',')
       else if (this.dayId <= 3) {
         const t = this.GameConfig['Day_' + this.dayId + '_AS_Order'].Value.split('|')[0]
         const n = this.GameConfig['Day_' + this.dayId + '_AS_Order'].Value.split('|')[1]
@@ -85,7 +121,15 @@ cc.Class({
   saveRecord: function () {
     if (facade.CurrentScene != 'SkipPage') {
       const e = {}
-      e.dayId = this.dayId, e.loginCount = this.loginCount, e.lastLoginTime = this.lastLoginTime, e.shareCount = this.shareCount, e.videoCount = this.videoCount, e.dayShareADCount = this.dayShareADCount, e.dayShareCount = this.dayShareCount, e.dayADCount = this.dayADCount, console.log('save shareModel data:', e)
+      e.dayId = this.dayId
+      e.loginCount = this.loginCount
+      e.lastLoginTime = this.lastLoginTime
+      e.shareCount = this.shareCount
+      e.videoCount = this.videoCount
+      e.dayShareADCount = this.dayShareADCount
+      e.dayShareCount = this.dayShareCount
+      e.dayADCount = this.dayADCount
+      console.log('save shareModel data:', e)
       const t = {
         game_id: window.facade.GameId,
         token: window.facade.getComponent('PlayerModel').token,
@@ -102,18 +146,23 @@ cc.Class({
         const o = this.ASRuleConfig[i]
         this.asRules['type_' + String(o.Type)] || (this.asRules['type_' + String(o.Type)] = [])
         const a = {}
-        a.id = o.ID, a.value = o.ValueType == 1 ? o.Value : o.Value / 1e4, this.asRules['type_' + String(o.Type)].push(a)
+        a.id = o.ID
+        a.value = o.ValueType == 1 ? o.Value : o.Value / 1e4
+        this.asRules['type_' + String(o.Type)].push(a)
       }
     }
     this.generateOrder()
   },
   getShareADType: function () {
-    console.log('lc shareAD-- 分享次数 = ', this.dayShareCount), console.log('lc shareAD-- 视频次数 = ', this.dayADCount), console.log('lc shareAD-- 分享视频合体 次数 =', this.dayShareADCount)
+    console.log('lc shareAD-- 分享次数 = ', this.dayShareCount)
+    console.log('lc shareAD-- 视频次数 = ', this.dayADCount)
+    console.log('lc shareAD-- 分享视频合体 次数 =', this.dayShareADCount)
     let e = void 0
     if (this.dayShareADCount < this.headOrderIds.length) e = Number(this.headOrderIds[this.dayShareADCount]), console.log('lc shareAD--  初始序列: 类型= ', parseInt(e) == 1 ? '视频' : '分享')
     else {
       const t = this.dayShareADCount % this.loopOrderIds.length
-      e = Number(this.loopOrderIds[t]), console.log('lc shareAD--  循环序列: 类型= ', parseInt(e) == 1 ? '视频' : '分享')
+      e = Number(this.loopOrderIds[t])
+      console.log('lc shareAD--  循环序列: 类型= ', parseInt(e) == 1 ? '视频' : '分享')
     }
     return e == 1 ? this.dayADCount < this.maxADCount ? (console.log('lc shareAD-- type 随机：看视频', this.dayADCount, this.maxADCount), 1) : this.dayShareCount < this.maxShareCount ? (console.log('lc shareAD-- type 随机： 视频看完 去分享', this.dayShareCount, this.maxShareCount), 2) : (console.log('lc shareAD-- type 随机： 视频看完 分享超过次数', this.dayShareCount, this.dayADCount), 3) : e == 2 ? this.dayShareCount < this.maxShareCount ? (console.log('lc shareAD-- type 随机： 去分享', this.dayShareCount, this.maxShareCount), 2) : this.dayADCount < this.maxADCount ? (console.log('lc shareAD-- type 随机：分享次数完成 去看视频', this.dayADCount, this.maxADCount), 1) : (console.log('lc shareAD-- type 随机：分享超过次数， 视频看完 ', this.dayShareCount, this.dayADCount), 3) : e
   },
@@ -129,16 +178,21 @@ cc.Class({
       ? (console.log('lc shareAD--  初始化 gameVideo'), this.sendMggfBehaveReport(1, 1), this.gameVideo = wx.createRewardedVideoAd({
           adUnitId: 'adunit-5b4582e3072248c3'
         }), this.gameVideo.onError(function (t) {
-          e.sendMggfBehaveReport(4, 1), console.log('lc shareAD--  视频加载失败 = ', t.errMsg), e.setupShareInfo(null)
+          e.sendMggfBehaveReport(4, 1)
+          console.log('lc shareAD--  视频加载失败 = ', t.errMsg)
+          e.setupShareInfo(null)
         }), this.gameVideo.onClose(function (t) {
           t.isEnded ? (console.log('lc shareAD-- 观看完成 关闭 = '), e.callback && (e.callback.succ(e.type), e.callback = null), e.sendMggfBehaveReport(3, 1)) : (console.log('lc shareAD--  观看未完成 关闭 = '), e.callback && (e.callback.fail('还没有看完视频,没法领取奖励哦~', e.type), e.callback = null))
         }))
       : console.log('lc shareAD--  已经创建 gameVideo'), this.gameVideo.load().then(function () {
       e.gameVideo.show().then(function () {
-        e.sendMggfBehaveReport(2, 1), console.log('lc shareAD--  显示成功, 上报')
+        e.sendMggfBehaveReport(2, 1)
+        console.log('lc shareAD--  显示成功, 上报')
       })
     }).catch(function (t) {
-      e.sendMggfBehaveReport(4, 1), console.log('lc shareAD--  load 看视频失败 去分享', t), e.setupShareInfo(null)
+      e.sendMggfBehaveReport(4, 1)
+      console.log('lc shareAD--  load 看视频失败 去分享', t)
+      e.setupShareInfo(null)
     }), this.dayADCount++, this.videoCount++, this.dayShareADCount++, this.saveRecord()
   },
   setupShareInfo: function () {
@@ -149,7 +203,8 @@ cc.Class({
     this.shareDataArr = facade.getComponent('GameModel').shareConfig
     const o = this
     const a = this.shareDataArr[c(0, this.shareDataArr.length)]
-    t == '' && (t = a.title, n = a.img), this.shareTime = (new Date()).getTime()
+    t == '' && (t = a.title, n = a.img)
+    this.shareTime = (new Date()).getTime()
 
     function s (t) {
       if (e) {
@@ -170,15 +225,15 @@ cc.Class({
     wx.onShow(function a () {
       const c = this
       e && (setTimeout(function () {
-        if ((new Date()).getTime() - o.shareTime >= 3e3) Math.random() > 0.1 ? (e && e.succ(), s(!0)) : (e && e.fail(), s(!1))
-        else if (Math.random() > 0.8) e && e.succ(), s(!0)
+        if ((new Date()).getTime() - o.shareTime >= 3e3) Math.random() > 0.1 ? (e && e.succ(), s(true)) : (e && e.fail(), s(false))
+        else if (Math.random() > 0.8) e && e.succ(), s(true)
         else {
-          if (o.shareTimes == 1) return e && e.fail(), s(!1), void (o.shareTimes = 0)
-          s(!1), e && setTimeout(function () {
+          if (o.shareTimes == 1) return e && e.fail(), s(false), void (o.shareTimes = 0)
+          s(false), e && setTimeout(function () {
             wx.showModal({
               title: '提示',
               content: '获取失败，换换其他的好友试试吧',
-              showCancel: !0,
+              showCancel: true,
               cancelText: '知道了',
               confirmText: '重新获取',
               success: function (a) {
@@ -201,7 +256,12 @@ cc.Class({
     }), this.dayShareCount++, this.shareCount++, this.dayShareADCount++, this.saveRecord()
   },
   onWxRegistered: function () {
-    this.initDefaultShare(), this.requestOnlineInfo(), this.reportInviteInfo(), this.requestInvitee(), this.saveRecord(), cc.systemEvent.emit(i.LOGININFO_GOT)
+    this.initDefaultShare()
+    this.requestOnlineInfo()
+    this.reportInviteInfo()
+    this.requestInvitee()
+    this.saveRecord()
+    cc.systemEvent.emit(ModuleEventEnum.LOGININFO_GOT)
   },
   requestInvitee: function () {
     const e = {
@@ -223,7 +283,11 @@ cc.Class({
     const a = new XMLHttpRequest()
     a.onreadystatechange = function () {
       a.readyState == 4 && a.status == 200 && this.httpResDeal(JSON.parse(a.responseText).data)
-    }.bind(this), a.onerror = function (e) {}, a.open('POST', o, !0), a.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded'), a.send(t)
+    }.bind(this)
+    a.onerror = function (e) {}
+    a.open('POST', o, true)
+    a.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    a.send(t)
   },
   reportInviteInfo: function () {
     const e = window.facade.getComponent('PlayerModel').wxAdaptor.getinviteRid()
@@ -237,7 +301,7 @@ cc.Class({
     window.net.getComponent('Net').httpRequest(window.net.AcceptInvite, n)
   },
   countWhetherShare: function () {
-    return !0
+    return true
   },
   getShareConfig: function (e) {
     this.shareConfig = [{
@@ -286,13 +350,22 @@ cc.Class({
         imageUrl: 'https://gcdn.qdos.com/game/common/file/201911061730043511/ab12312.png'
       }
     }), wx.showShareMenu({
-      withShareTicket: !0
+      withShareTicket: true
     })
   },
   defaultShareParamsInit: function (e, t, n) {
     const i = this
-    console.log('defaultShareParamsInit...', e, t, n), this.defaultShareText = e, this.defaultShareImge = t, this.defaultShareQuery = n, wx.onShareAppMessage(function () {
-      return console.log('defaultShare...'), i.shareCount++, i.dayShareADCount++, i.dayShareCount++, window.net.getComponent('Net').behaveReport(window.facade.BEHAVE_SHARE), {
+    console.log('defaultShareParamsInit...', e, t, n)
+    this.defaultShareText = e
+    this.defaultShareImge = t
+    this.defaultShareQuery = n
+    wx.onShareAppMessage(function () {
+      console.log('defaultShare...')
+      i.shareCount++
+      i.dayShareADCount++
+      i.dayShareCount++
+      window.net.getComponent('Net').behaveReport(window.facade.BEHAVE_SHARE)
+      return {
         title: i.defaultShareText,
         imageUrl: i.defaultShareImge,
         query: i.defaultShareQuery
@@ -301,16 +374,25 @@ cc.Class({
   },
   sendMggfBehaveReport: function (e, t) {
     const n = {}
-    n.da_action = e, n.da_position = void 0 == this.showId ? 0 : this.showId, n.da_type = t, n.game_id = facade.GameId, n.user_id = window.facade.getComponent('PlayerModel').privateUid, n.time = Math.floor((new Date()).getTime() / 1e3)
+    n.da_action = e
+    n.da_position = void 0 == this.showId ? 0 : this.showId
+    n.da_type = t
+    n.game_id = facade.GameId
+    n.user_id = window.facade.getComponent('PlayerModel').privateUid
+    n.time = Math.floor((new Date()).getTime() / 1e3)
     const i = this.getMggfSign(n)
     n.sign = i
     const o = window.facade.httpServerAdress + 'log/collectorDa'
     const a = new XMLHttpRequest()
-    a.onreadystatechange = function (e) {}, a.onerror = function (e) {}, a.open('POST', o, !1), a.send(n)
+    a.onreadystatechange = function (e) {}
+    a.onerror = function (e) {}
+    a.open('POST', o, false)
+    a.send(n)
   },
   getMggfSign: function (e) {
     const t = 'da_action=' + e.da_action + '&da_position=' + e.da_position + '&da_type=' + e.da_type + '&game_id=' + e.game_id + '&time=' + e.time + '&user_id=' + e.user_id + '|' + facade.Client_Secret
-    return console.log('lc getMggfSign =', t, cc.md5Encode(t).toLowerCase()), cc.md5Encode(t).toLowerCase()
+    console.log('lc getMggfSign =', t, cc.md5Encode(t).toLowerCase())
+    return cc.md5Encode(t).toLowerCase()
   },
   onWxShow: function () {},
   onWxHide: function () {},

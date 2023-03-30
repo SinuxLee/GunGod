@@ -1,4 +1,4 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -7,23 +7,29 @@ cc.Class({
     skipByVedioSkin: cc.SpriteFrame,
     recommendPre: cc.Prefab
   },
-  onLoad: function () {},
-  start: function () {},
+
   onEnable: function () {
     cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4
   },
   initRecommond: function () {},
   init: function () {
-    this.rewardType = window.facade.getComponent('ShareADModel').getShareADType(), this.rewardType != 2 ? this.skipButton.spriteFrame = this.skipByVedioSkin : this.skipButton.spriteFrame = this.skipByShareSkin, this.initRecommond()
+    this.rewardType = window.facade.getComponent('ShareADModel').getShareADType()
+    this.rewardType != 2 ? this.skipButton.spriteFrame = this.skipByVedioSkin : this.skipButton.spriteFrame = this.skipByShareSkin, this.initRecommond()
   },
   hide: function () {
     this.node.parent.getComponent('LevelUI').hideSkip()
   },
   onDisable: function () {
-    this.inited = !1, cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1, cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = !0
+    this.inited = false
+    cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1
+    cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = true
   },
   skip: function () {
-    if (!facade.isMiniGame) return this.hide(), void cc.systemEvent.emit(i.SKIP)
+    if (!facade.isMiniGame) {
+      this.hide()
+      cc.systemEvent.emit(ModuleEventEnum.SKIP)
+      return
+    }
     if (this.rewardType > 2) popUp.getComponent('FloatTip').showTip('已经超出今天的跳关上限啦！')
     else {
       const e = {
@@ -34,13 +40,14 @@ cc.Class({
       }
       window.facade.getComponent('ShareADModel').showShareAD(e, {
         succ: function (e) {
-          console.log('跳关分享成功:', e), this.hide(), cc.systemEvent.emit(i.SKIP)
+          console.log('跳关分享成功:', e)
+          this.hide()
+          cc.systemEvent.emit(ModuleEventEnum.SKIP)
         }.bind(this),
         fail: function (e, t) {
           popUp.getComponent('FloatTip').showTip(e)
         }
       })
     }
-  },
-  update: function (e) {}
+  }
 })

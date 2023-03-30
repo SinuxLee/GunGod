@@ -11,7 +11,8 @@ const i = cc.Class({
   },
   put: function (e, t) {
     let n = this._pools[e]
-    n == null && (cc.error('名为{0}的池对象不存在,新创建一个'.format(e)), n = new cc.NodePool(), this._pools[e] = n), n.put(t)
+    n == null && (cc.error('名为{0}的池对象不存在,新创建一个'.format(e)), n = new cc.NodePool(), this._pools[e] = n)
+    n.put(t)
   },
   get: function (e) {
     const t = this._pools[e]

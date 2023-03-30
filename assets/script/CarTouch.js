@@ -1,31 +1,47 @@
-const i = require('MathUtils')
+const MathUtils = require('MathUtils')
+
 cc.Class({
   extends: cc.Component,
-  properties: {},
+
   onLoad: function () {
-    this.inDragging = !1
+    this.inDragging = false
   },
+
   initData: function () {
-    this.track = this.node.getComponent('CarOperations').track, this.track.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this), this.track.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this), this.track.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this), this.track.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this)
+    this.track = this.node.getComponent('CarOperations').track
+    this.track.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
+    this.track.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this)
+    this.track.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this)
+    this.track.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this)
   },
+
   releaseData: function () {
-    this.track.off(cc.Node.EventType.TOUCH_START), this.track.off(cc.Node.EventType.TOUCH_MOVE), this.track.off(cc.Node.EventType.TOUCH_END), this.track.off(cc.Node.EventType.TOUCH_CANCEL), this.track = null, this.rangePoints = null
+    this.track.off(cc.Node.EventType.TOUCH_START)
+    this.track.off(cc.Node.EventType.TOUCH_MOVE)
+    this.track.off(cc.Node.EventType.TOUCH_END)
+    this.track.off(cc.Node.EventType.TOUCH_CANCEL)
+    this.track = null
+    this.rangePoints = null
   },
+
   onTouchStart: function (e) {
     const t = e.getLocation()
     this._startTouchPos = t
     const n = this.pickACar(t)
     n && (n.park.getComponent('ParkCarJS').getParkStatus() == facade.CAR_GIFT || n.park.getComponent('ParkCarJS').carUId && n.park.getComponent('ParkCarJS').carUId != '' && n.park.getComponent('ParkCarJS').getParkStatus() != facade.CAR_ANIMATION) ? this._selectPark = n : this._selectPark = null
   },
+
   onTouchMove: function (e) {
     const t = e.getLocation()
     if (this._selectPark && this._selectPark.park.getComponent('ParkCarJS').getParkStatus() != facade.CAR_RACING && this._selectPark.park.getComponent('ParkCarJS').getParkStatus() != facade.CAR_GIFT) {
       if (this.inDragging) {
         const n = this.node.getComponent('CarOperations').parkField.parent.convertToNodeSpaceAR(t)
-        this.dragOne.x = n.x, this.dragOne.y = n.y
+        this.dragOne.x = n.x
+        this.dragOne.y = n.y
       } else cc.pDistance(this._startTouchPos, t) >= 20 && this.startDrag()
     }
   },
+
   onTouchEnd: function (e) {
     if (this._selectPark) {
       const t = this._selectPark.park.getComponent('ParkCarJS')
@@ -85,24 +101,24 @@ cc.Class({
   },
   startDrag: function () {
     if (this._selectPark.park.getComponent('ParkCarJS').carUId && this._selectPark.park.getComponent('ParkCarJS').carUId != '') {
-      this.node.getComponent('GameMainJS').disableBuy(), this.inDragging = !0
+      this.node.getComponent('GameMainJS').disableBuy(), this.inDragging = true
       const e = window.facade.getComponent('GameModel').getCarLevelById(this._selectPark.park.getComponent('ParkCarJS').carId)
       this.dragOne = this.node.getComponent('CarOperations').createMoveCar(e)
       const t = this._selectPark.park.convertToNodeSpaceAR(this._startTouchPos)
       this.dragOne.x = t.x, this.dragOne.y = t.y
       const n = this._selectPark.park.getComponent('ParkCarJS')
-      n.isMainPark && this.dragOne.getComponent(cc.Sprite)._sgNode.setState(n.carState), this._selectPark.park.getComponent('ParkCarJS').setCarGray(!0), this.node.getComponent('CarOperations').showMergeNote(this._selectPark.park.getComponent('ParkCarJS'))
+      n.isMainPark && this.dragOne.getComponent(cc.Sprite)._sgNode.setState(n.carState), this._selectPark.park.getComponent('ParkCarJS').setCarGray(true), this.node.getComponent('CarOperations').showMergeNote(this._selectPark.park.getComponent('ParkCarJS'))
     }
   },
   startComposeGuide: function () {
     const e = window.facade.getComponent('GuideModel')
     if (window.facade.getComponent('UserModel').roleInfo.signinCount == 1 && e.curStep == window.facade.GUIDE_COMPOSE) {
-      this._selectPark && this.inDragging && (this.dragCancel(), this._selectPark = null), this.dragOne && (this.dragOne.removeFromParent(), this.dragOne = null), this.inDragging = !0
+      this._selectPark && this.inDragging && (this.dragCancel(), this._selectPark = null), this.dragOne && (this.dragOne.removeFromParent(), this.dragOne = null), this.inDragging = true
       const t = this.node.getComponent('CarOperations').parks
       this._selectPark = {
         park: t[0],
         index: 0
-      }, this.dragOne = this.node.getComponent('CarOperations').createMoveCar(1), this._selectPark.park.getComponent('ParkCarJS').setCarGray(!0)
+      }, this.dragOne = this.node.getComponent('CarOperations').createMoveCar(1), this._selectPark.park.getComponent('ParkCarJS').setCarGray(true)
       let n = this._selectPark.park.convertToWorldSpaceAR(cc.v2(0, 0))
       n = this.dragOne.parent.convertToNodeSpaceAR(n), this.dragOne.x = n.x, this.dragOne.y = n.y, this.node.getComponent('CarOperations').showMergeNote(this._selectPark.park.getComponent('ParkCarJS'))
       let i = t[1].convertToWorldSpaceAR(cc.v2(0, 0))
@@ -116,12 +132,12 @@ cc.Class({
   startMovetoTarckGuide: function () {
     const e = window.facade.getComponent('GuideModel')
     if (window.facade.getComponent('UserModel').roleInfo.signinCount == 1 && e.curStep == window.facade.GUIDE_MOVETO_TRACK) {
-      this._selectPark && this.inDragging && (this.dragCancel(), this._selectPark = null), this.dragOne && (this.dragOne.removeFromParent(), this.dragOne = null), this.inDragging = !0
+      this._selectPark && this.inDragging && (this.dragCancel(), this._selectPark = null), this.dragOne && (this.dragOne.removeFromParent(), this.dragOne = null), this.inDragging = true
       const t = this.node.getComponent('CarOperations').parks
       this._selectPark = {
         park: t[1],
         index: 1
-      }, this._selectPark.park.getComponent('ParkCarJS').setCarGray(!0)
+      }, this._selectPark.park.getComponent('ParkCarJS').setCarGray(true)
       const n = window.facade.getComponent('GameModel').getCarLevelById(this._selectPark.park.getComponent('ParkCarJS').carId)
       this.dragOne = this.node.getComponent('CarOperations').createMoveCar(n)
       const i = this.dragOne.parent.convertToNodeSpaceAR(this.node.convertToWorldSpaceAR(cc.v2(287, 0))).x
@@ -135,7 +151,7 @@ cc.Class({
     }
   },
   endGuide: function () {
-    this.inDragging = !1, this.dragOne = null, this._selectPark = null, this.node.getComponent('CarOperations').hideMergeNote()
+    this.inDragging = false, this.dragOne = null, this._selectPark = null, this.node.getComponent('CarOperations').hideMergeNote()
   },
   dragCancel: function () {
     this.node.getComponent('CarOperations').hideMergeNote()
@@ -143,19 +159,19 @@ cc.Class({
     this.dragOne && this.dragOne.runAction(cc.sequence(cc.moveTo(0.2, e), cc.callFunc(this.dragCancelDeal, this)))
   },
   dragCancelDeal: function () {
-    this.node.getComponent('GameMainJS').enableBuy(), this._selectPark.park.getComponent('ParkCarJS').setCarGray(!1), this.dragOne.removeFromParent(), this.dragOne = null, this.inDragging = !1
+    this.node.getComponent('GameMainJS').enableBuy(), this._selectPark.park.getComponent('ParkCarJS').setCarGray(false), this.dragOne.removeFromParent(), this.dragOne = null, this.inDragging = false
   },
   dragEnd: function () {
-    this.node.getComponent('CarOperations').hideMergeNote(), this.node.getComponent('GameMainJS').enableBuy(), this._selectPark.park.getComponent('ParkCarJS').setCarGray(!1), this.dragOne.removeFromParent(), this.dragOne = null, this.inDragging = !1
+    this.node.getComponent('CarOperations').hideMergeNote(), this.node.getComponent('GameMainJS').enableBuy(), this._selectPark.park.getComponent('ParkCarJS').setCarGray(false), this.dragOne.removeFromParent(), this.dragOne = null, this.inDragging = false
   },
   dragRelease: function () {
-    this.node.getComponent('CarOperations').hideMergeNote(), this.node.getComponent('GameMainJS').enableBuy(), this.dragOne.removeFromParent(), this.dragOne = null, this.inDragging = !1
+    this.node.getComponent('CarOperations').hideMergeNote(), this.node.getComponent('GameMainJS').enableBuy(), this.dragOne.removeFromParent(), this.dragOne = null, this.inDragging = false
   },
   inFieldRange: function (e) {
     this.range = this.node.getComponent('CarOperations').range
     const t = this.range.node.parent.convertToNodeSpaceAR(e)
     const n = this.getRangePoints()
-    return i.pointIsInPolygon(t, n)
+    return MathUtils.pointIsInPolygon(t, n)
   },
   getRangePoints: function () {
     if (this.rangePoints) return this.rangePoints

@@ -1,4 +1,4 @@
-const i = require('MoreGameManager')
+const MoreGameManager = require('MoreGameManager')
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -7,14 +7,14 @@ cc.Class({
     gameRun: cc.Node
   },
   show: function () {
-    this.content.y = 0, this.node.active = !0
+    this.content.y = 0, this.node.active = true
   },
   onEnable: function () {
     this.initData()
   },
   initData: function () {
     const e = this
-    i.requestMoreGameList(function (t) {
+    MoreGameManager.requestMoreGameList(function (t) {
       e.showRecommendGameList(t)
     })
   },
@@ -23,14 +23,15 @@ cc.Class({
       for (let t = 0; t < e.length; t++) {
         const n = cc.instantiate(this.itemPrefab)
         const i = JSON.parse(JSON.stringify(e[t]))
-        i.icon = i.previewUrl, n.getComponent('RecommendGameItem').setupItemData(i), this.content.addChild(n)
+        i.icon = i.previewUrl
+        n.getComponent('RecommendGameItem').setupItemData(i)
+        this.content.addChild(n)
       }
       this.content.height = 252 * e.length / 2
     }
   },
-  start: function () {},
   scrollEvent: function (e, t) {},
   close: function () {
-    this.node.active = !1
+    this.node.active = false
   }
 })

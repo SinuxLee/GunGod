@@ -8,14 +8,20 @@ cc.Class({
     canGet: cc.Node,
     reveiceBtn: cc.Node
   },
+
   start: function () {
-    this.addTip.active = !1, this.awardCount.string = 'x' + facade.getComponent('ShareADModel').GameConfig.InviteB.Value
+    this.addTip.active = false
+    this.awardCount.string = 'x' + facade.getComponent('ShareADModel').GameConfig.InviteB.Value
   },
   setItemData: function (e, t, n) {
-    this.id = e, this.itemID = t, this.itemData = n, n.user_id == 0 ? (this.notInvite.active = !0, this.addTip.active = !0, this.inviteLab.actiev = !0, this.canGet.active = !1, this.reveiceBtn.active = !1) : (this.canGet.active = !0, this.reveiceBtn.active = !0, this.notInvite.active = !1, this.addTip.active = !1, this.inviteLab.actiev = !1)
+    this.id = e
+    this.itemID = t
+    this.itemData = n
+    n.user_id == 0 ? (this.notInvite.active = true, this.addTip.active = true, this.inviteLab.actiev = true, this.canGet.active = false, this.reveiceBtn.active = false) : (this.canGet.active = true, this.reveiceBtn.active = true, this.notInvite.active = false, this.addTip.active = false, this.inviteLab.actiev = false)
   },
   onClickRevice: function () {
-    facade.getComponent('GameModel').applyInviteNewbieReward(this.itemID, this.itemData.user_id), popUp.getComponent('Pop').removeTop()
+    facade.getComponent('GameModel').applyInviteNewbieReward(this.itemID, this.itemData.user_id)
+    popUp.getComponent('Pop').removeTop()
   },
   onClickInvite: function () {
     const e = {

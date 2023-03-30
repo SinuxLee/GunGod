@@ -1,16 +1,22 @@
-const i = require('ModuleEventEnum')
+const ModuleEventEnum = require('ModuleEventEnum')
+
 cc.Class({
   extends: cc.Component,
-  properties: {},
+
   onLoad: function () {
     this.init()
   },
-  start: function () {},
+
   init: function () {
-    this.node.TIME_ZONE_OFFSET = -28800, this.inSocketErr = !1, this.inConnecting = !1, this._httpConnector = this.node.getComponent('HttpConnector'), setInterval(this.sendHeart.bind(this), 3e4)
+    this.node.TIME_ZONE_OFFSET = -28800
+    this.inSocketErr = false
+    this.inConnecting = false
+    this._httpConnector = this.node.getComponent('HttpConnector')
+    setInterval(this.sendHeart.bind(this), 3e4)
   },
   fakeLogin: function () {
-    this.node.getComponent('FakeInfoLogic') || (this.node.addComponent('FakeInfoLogic'), this.node.getComponent('FakeInfoLogic').init()), this.node.getComponent('FakeInfoLogic').fakeLogin()
+    this.node.getComponent('FakeInfoLogic') || (this.node.addComponent('FakeInfoLogic'), this.node.getComponent('FakeInfoLogic').init())
+    this.node.getComponent('FakeInfoLogic').fakeLogin()
   },
   connect: function (e) {
     this._connector.connect(e)
@@ -19,13 +25,21 @@ cc.Class({
     this._connector.send(e)
   },
   close: function () {
-    this.inConnecting = !1, this._connector.close()
+    this.inConnecting = false
+    this._connector.close()
   },
   onConnected: function () {
-    console.log('server connect...'), this.inError = !1, this.inConnecting = !0, cc.systemEvent.emit(i.SERVER_CONNECTED)
+    console.log('server connect...')
+    this.inError = false
+    this.inConnecting = true
+    cc.systemEvent.emit(ModuleEventEnum.SERVER_CONNECTED)
   },
   updateServerTime: function (e) {
-    this.serverTimeSec = e.currTs, this.serverTimeMs = e.currMs, this.serverLaunchMs = e.runTs, this._timeUpdateFlag = (new Date()).getTime(), this._canSendHeart = !0
+    this.serverTimeSec = e.currTs
+    this.serverTimeMs = e.currMs
+    this.serverLaunchMs = e.runTs
+    this._timeUpdateFlag = (new Date()).getTime()
+    this._canSendHeart = true
   },
   getServerLaunchMs: function () {
     const e = (new Date()).getTime() - this._timeUpdateFlag
@@ -37,14 +51,17 @@ cc.Class({
   },
   getServerToday0Clock: function () {
     const e = new Date(1e3 * window.net.getComponent('Net').getServerTimeSec())
-    return e.setHours(0, 0, 0, 0), Math.floor(e.getTime() / 1e3)
+    e.setHours(0, 0, 0, 0)
+    return Math.floor(e.getTime() / 1e3)
   },
   onResponse: function (e) {
-    switch (console.log('onResponse:', JSON.stringify(e)), e.messageName = e.GetMessageName(), e.messageName) {
+    console.log('onResponse:', JSON.stringify(e))
+    e.messageName = e.GetMessageName()
+    switch (e.messageName) {
       case 'Message_login.GCResHeartMessage':
         this.updateServerTime(e)
     }
-    cc.systemEvent.emit(i.SERVER_RESPONSE, e)
+    cc.systemEvent.emit(ModuleEventEnum.SERVER_RESPONSE, e)
   },
   sendHeart: function () {
     if (console.log('sendHeart...'), this._canSendHeart) {
@@ -56,7 +73,13 @@ cc.Class({
     t.hasOwnProperty('token') && void 0 == t.token || this._httpConnector.request(e, t)
   },
   requestQQApi: function (e, t) {
-    t || (t = {}), t.appid = window.facade.qqAppId, t.openid = window.facade.openId, t.openkey = window.facade.openKey, t.pf = window.facade.pF, t.format = 'json', this._httpConnector.requestQQApi(e, t)
+    t || (t = {})
+    t.appid = window.facade.qqAppId
+    t.openid = window.facade.openId
+    t.openkey = window.facade.openKey
+    t.pf = window.facade.pF
+    t.format = 'json'
+    this._httpConnector.requestQQApi(e, t)
   },
   behaveReport: function (e) {
     this._httpConnector.behaveReport(e)
@@ -68,11 +91,15 @@ cc.Class({
     this._httpConnector.requestUrl(e, t, n, i, o)
   },
   socketErrorDeal: function () {
-    this.inConnecting = !1, this.inError = !0, this.node.runAction(cc.sequence(cc.delayTime(1), cc.callFunc(this.alertNetError, this)))
+    this.inConnecting = false
+    this.inError = true
+    this.node.runAction(cc.sequence(cc.delayTime(1), cc.callFunc(this.alertNetError, this)))
   },
   alertNetError: function () {
     window.facade.CurrentScene != 'Title' && this.inError && window.popUp.getComponent('Pop').addAlert('网络好像出问题了哦！点“确认”重新登录试试吧~', function () {
-      window.facade.reEnter = !0, window.popUp.getComponent('Pop').reset(), cc.systemEvent.emit(i.RE_ENTERED, !0)
-    }, !1)
+      window.facade.reEnter = true
+      window.popUp.getComponent('Pop').reset()
+      cc.systemEvent.emit(ModuleEventEnum.RE_ENTERED, true)
+    }, false)
   }
 })
