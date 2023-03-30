@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "6bb0a2a9-96c9-4b39-b0fb-e5005746d7ba",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 164,
+  "height": 164,
   "platformSettings": {},
   "subMetas": {
     "image_BlueBoom": {

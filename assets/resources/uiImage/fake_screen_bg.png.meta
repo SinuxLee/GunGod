@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "7fea3178-be7b-4fc4-8d62-eb2a014150e6",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 109,
+  "height": 104,
   "platformSettings": {},
   "subMetas": {
     "fake_screen_bg": {

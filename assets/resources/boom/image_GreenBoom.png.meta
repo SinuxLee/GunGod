@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "968f905e-d113-44aa-8cf2-9f957993bd8a",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 164,
+  "height": 164,
   "platformSettings": {},
   "subMetas": {
     "image_GreenBoom": {

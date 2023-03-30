@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "99e728a1-8032-4352-9d00-303800068423",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 750,
+  "height": 1500,
   "platformSettings": {},
   "subMetas": {
     "Scene_BG_5": {

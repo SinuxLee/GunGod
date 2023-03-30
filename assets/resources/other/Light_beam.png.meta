@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "87db817a-a644-4021-a904-1568c0f0d82d",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 171,
+  "height": 393,
   "platformSettings": {},
   "subMetas": {
     "Light_beam": {

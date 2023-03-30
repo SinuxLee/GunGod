@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "219bad5d-57b5-4b14-ac95-4beeb2eb58b0",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 164,
+  "height": 164,
   "platformSettings": {},
   "subMetas": {
     "image_BoomG": {

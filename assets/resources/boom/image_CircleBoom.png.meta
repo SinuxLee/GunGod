@@ -1,5 +1,5 @@
 {
-  "ver": "2.3.3",
+  "ver": "2.3.4",
   "uuid": "3ddf5ea6-3a07-431c-8e8b-f7178637dded",
   "type": "sprite",
   "wrapMode": "clamp",
@@ -7,6 +7,8 @@
   "premultiplyAlpha": false,
   "genMipmaps": false,
   "packable": true,
+  "width": 164,
+  "height": 164,
   "platformSettings": {},
   "subMetas": {
     "image_CircleBoom": {
