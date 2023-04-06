@@ -14,7 +14,7 @@ cc.Class({
   },
 
   start () {
-    if(this.node.master.match('suffer')) {
+    if (this.node.master.match('suffer')) {
       // 拖尾效果
       this.node.getChildByName('tail').getComponent(cc.MotionStreak).color = cc.color(255, 255, 255)
     }
@@ -22,7 +22,7 @@ cc.Class({
 
   onBeginContact (contact, self, other) {
     if (self.node.group == 'bullet' && other.node.group == 'body') {
-      if (this._kills[other.node.parent.name] == null){
+      if (this._kills[other.node.parent.name] == null) {
         if (this.reflectCount <= 0 && other.node.parent.name == 'role') return
         this._hitman = other.node.parent
         this.hit = true
@@ -40,11 +40,11 @@ cc.Class({
       return
     }
 
-    if (self.node.group == 'bullet' && this._first && 
+    if (self.node.group == 'bullet' && this._first &&
       (other.node.group == 'border' || other.node.group == 'prop')) {
       const hitEarth = cc.instantiate(cc.director.getScene().getChildByName('Canvas').getChildByName('hitEarth'))
       const levelPlay = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay')
-      
+
       hitEarth.position = levelPlay.convertToNodeSpaceAR(self.node.convertToWorldSpaceAR(cc.v2()))
       hitEarth.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
       hitEarth.getComponent(cc.ParticleSystem).resetSystem()
@@ -55,7 +55,7 @@ cc.Class({
     this.reflectCount++
     window.audio.getComponent('SoundManager').playEffect('reflect')
 
-    if(this.reflectCount > 20) {
+    if (this.reflectCount > 20) {
       window.facade.getComponent('LevelModel').useABullet()
       this.node.removeFromParent()
     }
@@ -64,12 +64,12 @@ cc.Class({
   onPreSolve (contact, self, other) {
     if (self.node.group == 'bullet' && other.node.group == 'body') {
       contact.disabled = true
-      if(!this.out){
+      if (!this.out) {
         other.node.getComponent(cc.RigidBody).applyForceToCenter(cc.v2(10000, 10000))
       }
       return
     }
-    
+
     self.body.isCross = false
     if (self.node.group == 'bullet' && other.node.group == 'box') {
       const crateBoom = cc.instantiate(this.crateBoomPre)
@@ -84,7 +84,7 @@ cc.Class({
   },
 
   onPostSolve (contact, self, other) {
-    if(self.node.group == 'bullet' && other.node.group == 'body'){
+    if (self.node.group == 'bullet' && other.node.group == 'body') {
       contact.disabled = true
       this.out = true
     }
@@ -93,8 +93,8 @@ cc.Class({
 
   update (dt) {
     this.frameCount++
-    const worldPos = this.node.convertToWorldSpaceAR(cc.v2());
-    if(worldPos.x < -500 || worldPos.x > 1300 || 
+    const worldPos = this.node.convertToWorldSpaceAR(cc.v2())
+    if (worldPos.x < -500 || worldPos.x > 1300 ||
       worldPos.y <= -500 || worldPos.y > 2000) {
       window.facade.getComponent('LevelModel').useABullet()
       this.node.removeFromParent()

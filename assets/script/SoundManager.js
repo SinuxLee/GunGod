@@ -1,83 +1,101 @@
 cc.Class({
   extends: cc.Component,
 
-  start: function () {
+  start () {
     this._soundActive = true
     this.isPlayingBgm = false
     this._effectSources = {}
     this._currentMusicVolume = 100
     this._loadEffectWaits = []
   },
-  playEffect: function (e, t, n) {
-    t || (t = false), n || (n = 100)
-    const i = 'audio/' + e + '.mp3'
-    if (this._effectSources[i] == null) {
+
+  playEffect (name, loop = false, val = 100) {
+    const path = 'audio/' + name + '.mp3'
+    if (this._effectSources[path] == null) {
       if (this._soundActive) {
-        const o = {}
-        o.file = i
-        o.isLoop = t
-        o.volume = n
-        this._loadEffectWaits.push(o)
+        this._loadEffectWaits.push({
+          file: path,
+          isLoop: loop,
+          volume: val
+        })
       }
     } else {
-      this._currentVolume = n
-      const a = cc.audioEngine.play(cc.loader.getRes(i), t, this._currentVolume / 100)
-      this._effectSources[i] = a
+      this._currentVolume = val
+      this._effectSources[path] = cc.audioEngine.play(cc.loader.getRes(path), loop, this._currentVolume / 100)
     }
   },
-  loadBGMResCallBack: function (e, t) {
+
+  loadBGMResCallBack (e, t) {
     cc.audioEngine.stop(this.bgmId)
     this.bgmId = cc.audioEngine.play(t, true, this._currentMusicVolume / 300)
   },
-  loadEffectResCallBack: function (e, t) {
+
+  loadEffectResCallBack (e, t) {
     this._isLoading = false
-    const n = cc.audioEngine.play(t, false, this._currentVolume / 100)
-    this._effectSources[this._currentFile] = n
+    this._effectSources[this._currentFile] = cc.audioEngine.play(t, false, this._currentVolume / 100)
   },
-  stopEffect: function (e) {
-    const t = 'audio/' + e + '.mp3'
-    cc.audioEngine.stop(this._effectSources[t])
+
+  stopEffect (name) {
+    const path = 'audio/' + name + '.mp3'
+    cc.audioEngine.stop(this._effectSources[path])
   },
-  stopAllEffects: function () {
-    for (const e in this._effectSources) {
-      cc.audioEngine.stop(this._effectSources[e])
-      cc.audioEngine.uncache(e)
-      delete this._effectSources[e]
+
+  stopAllEffects () {
+    for (const name in this._effectSources) {
+      cc.audioEngine.stop(this._effectSources[name])
+      cc.audioEngine.uncache(name)
+      delete this._effectSources[name]
     }
     this._effectSources = {}
   },
-  setBGM: function (e) {
-    this._currentBGMKey = e
+
+  setBGM (name) {
+    this._currentBGMKey = name
     if (this._soundActive) {
-      if (this._currentBGM == e) return void this.resumeBGM()
-      const t = 'audio/' + e
-      if (this._currentBGM == t) return void this.resumeBGM()
-      this._currentBGM = t
-      cc.loader.loadRes(t, this.loadBGMResCallBack.bind(this))
+      if (this._currentBGM == name) return void this.resumeBGM()
+
+      const path = 'audio/' + name
+      if (this._currentBGM == path) return void this.resumeBGM()
+
+      this._currentBGM = path
+      cc.loader.loadRes(path, this.loadBGMResCallBack.bind(this))
       this.isPlayingBgm = true
     }
   },
-  playBGM: function () {},
-  resumeBGM: function () {
-    if (this._soundActive) return this.bgmId != null && (this.isPlayingBgm = true, cc.audioEngine.resume(this.bgmId), true)
+
+  playBGM () {},
+
+  resumeBGM () {
+    if (this._soundActive && this.bgmId != null) {
+      this.isPlayingBgm = true
+      cc.audioEngine.resume(this.bgmId)
+      return true
+    }
+
+    return false
   },
-  pauseBGM: function () {
+
+  pauseBGM () {
     this.isPlayingBgm = false
     cc.audioEngine.pause(this.bgmId)
   },
-  stopBGM: function () {
+
+  stopBGM () {
     this.isPlayingBgm = false
     cc.audioEngine.stop(this.bgmId)
     cc.audioEngine.uncache(this._currentBGM)
     this.bgmId = null
   },
-  setBGMVolume: function (e) {
-    this._currentMusicVolume = e
+
+  setBGMVolume (vol) {
+    this._currentMusicVolume = vol
   },
-  stopAllSound: function () {
+
+  stopAllSound () {
     this.stopAllEffects()
   },
-  update: function (e) {
+
+  update (e) {
     if (this._loadEffectWaits.length != 0 && this._isLoading != 1) {
       const t = this._loadEffectWaits.shift()
       this._currentFile = t.file
@@ -87,8 +105,20 @@ cc.Class({
       this._isLoading = true
     }
   },
-  setSoundEnabled: function (e) {
-    this._soundActive = e
-    e ? this.resumeBGM() || (this._currentBGMKey ? this.setBGM(this._currentBGMKey) : window.facade.CurrentScene == 'Game' && (this._currentBGM = null, this.setBGM('Bgm'))) : (this.pauseBGM(), this.stopAllEffects())
+
+  setSoundEnabled (isActive) {
+    this._soundActive = isActive
+    if (isActive) {
+      if (!this.resumeBGM()) {
+        if (this._currentBGMKey) this.setBGM(this._currentBGMKey)
+        else if (window.facade.CurrentScene == 'Game') {
+          this._currentBGM = null
+          this.setBGM('Bgm')
+        }
+      }
+    } else {
+      this.pauseBGM()
+      this.stopAllEffects()
+    }
   }
 })

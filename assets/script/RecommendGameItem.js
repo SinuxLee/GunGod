@@ -14,7 +14,8 @@ cc.Class({
     effEndC: 0,
     effImg: cc.Sprite
   },
-  update: function () {
+
+  update () {
     this.frameCount || (this.frameCount = 0)
     this.frameCount++
     if (this.frameCount % 5 == 0) {
@@ -45,7 +46,8 @@ cc.Class({
       }
     }
   },
-  setupItemData: function (e) {
+
+  setupItemData (e) {
     if (e && e.name) {
       this.node.active = true
       this._historyDataArr || (this._historyDataArr = [])
@@ -72,11 +74,13 @@ cc.Class({
       } else this.effNode && (this.effNode.destroy(), this.effNode.parent = null, this.effNode = null, this.data.effectUrl = null, this.effStartC = 0, this.effEndC = 0, this.effType = null)
     } else this.node.active = false
   },
-  isInHistory: function (e) {
+
+  isInHistory (e) {
     for (let t = 0; t < this._historyDataArr.length; t++) { if (e.icon == this._historyDataArr[t].icon) return true }
     return false
   },
-  btnGoGameOnClick: function () {
+
+  btnGoGameOnClick () {
     MoreGameManager.navigateToMiniProgram(this.appId, this.path)
   }
 })

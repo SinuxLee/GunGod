@@ -4,47 +4,51 @@ cc.Class({
   properties: {
     recommendList: []
   },
-  uploadNavigateOut: function (e, t, n) {
+
+  uploadNavigateOut (e, t, n) {
     const i = {
       game_id: window.facade.GameId,
       to_game_id: t,
       final_to_game_id: n,
       token: window.facade.getComponent('PlayerModel').token
     }
-    window.net.getComponent('Net').httpRequest(window.net.NavigateOut, i), e == 1 ? this.requestHomeRecommend() : (this.requestRecommendGame(), this.requestHomeRecommend())
+    window.net.getComponent('Net').httpRequest(window.net.NavigateOut, i)
+    e == 1 ? this.requestHomeRecommend() : (this.requestRecommendGame(), this.requestHomeRecommend())
   },
-  showRecommendGameList: function (e) {
+
+  showRecommendGameList (e) {
     this.node.opacity = 255
     this.node.active = true
     this.content.x = 0
     this.content.removeAllChildren()
     for (let t = 0; t < e.length; t++) {
-      let n = null;
-      (n = cc.instantiate(this.itemPrefab)).x = 134 * t + 67
-      n.active = true
-      n.getComponent('RecommendGameItem').setupItemData(e[t])
-      this.content.addChild(n)
+      const node = cc.instantiate(this.itemPrefab)
+      node.x = 134 * t + 67
+      node.active = true
+      node.getComponent('RecommendGameItem').setupItemData(e[t])
+      this.content.addChild(node)
     }
     this.content.width = 134 * e.length
     this.content.width <= this.node.width - 40 ? this.isOpen = false : (this.isOpen = true, this.isLeft = true)
   },
-  requestHomeRecommend: function () {
-    const e = this
+
+  requestHomeRecommend () {
     const t = window.facade.httpServerAdress + window.net.RecommendGame
     const n = {
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token
     }
     Network.postRequest(t, n, {
-      success: function (t) {
+      success: (t) => {
         const n = facade.getComponent('PlayerModel').getRecommondCount()
-        const i = e.setupRecommendList(t.recommend_info, n, 3, [])
+        const i = this.setupRecommendList(t.recommend_info, n, 3, [])
         cc.systemEvent.emit(ME.HOME_RECOMMEND, i)
       },
-      failure: function (e) {}
+      failure: (e) => {}
     })
   },
-  requestResultRecommend: function () {
+
+  requestResultRecommend () {
     const e = this
     const t = window.facade.httpServerAdress + window.net.RecommendGame
     const n = {
@@ -59,7 +63,8 @@ cc.Class({
       failure: function (e) {}
     })
   },
-  requestRecommendGame: function () {
+
+  requestRecommendGame () {
     const e = this
     const t = window.facade.httpServerAdress + window.net.RecommendGame
     const n = {
@@ -74,7 +79,8 @@ cc.Class({
       failure: function (e) {}
     })
   },
-  setupRecommendList: function (e, t, n, i) {
+
+  setupRecommendList (e, t, n, i) {
     for (var o = [], a = 0; a < e.length; a++) {
       const s = e[a]
       parseInt(s.group) == n && o.push(s)

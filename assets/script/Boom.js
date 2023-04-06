@@ -7,8 +7,8 @@ cc.Class({
   },
 
   onBeginContact (contact, self, other) {
-    if(self.node.group != 'boom') return
-    switch(other.node.group){
+    if (self.node.group != 'boom') return
+    switch (other.node.group) {
       case 'bullet':
         this.explosive()
         break
@@ -16,7 +16,7 @@ cc.Class({
       case 'boom':
         const x = self.body._b2Body.m_linearVelocity.x - other.body._b2Body.m_linearVelocity.x
         const y = self.body._b2Body.m_linearVelocity.y - -other.body._b2Body.m_linearVelocity.y
-        if(cc.v2(x, y).mag() > 2) this.explosive()
+        if (cc.v2(x, y).mag() > 2) this.explosive()
         break
     }
   },
@@ -35,8 +35,8 @@ cc.Class({
     levelType == 'vip' && (newType = 'vip')
     levelType == 'injury' && (newType = 'role')
 
-    let nodes = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').getChildren()
-    let pos = this.node.position
+    const nodes = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').getChildren()
+    const pos = this.node.position
 
     for (let i = 0; i < nodes.length; i++) {
       if (nodes[i].name.match('suffer') || nodes[i].name.match(newType)) {
@@ -48,14 +48,14 @@ cc.Class({
   },
 
   killSuffer (node) {
-    let vec = node.position.sub(this.node.position).normalizeSelf()
+    const vec = node.position.sub(this.node.position).normalizeSelf()
     for (let i = 0; i < node.getChildren().length; i++) {
       const childNode = node.getChildren()[i]
       const rigidBody = childNode.getComponent(cc.RigidBody)
       if (childNode.group == 'body' && rigidBody) {
         const point = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(childNode.convertToWorldSpaceAR(cc.v2()))
         rigidBody.applyLinearImpulse(vec.mulSelf(1.8), point)
-        
+
         const blood = cc.instantiate(node.getChildByName('blood'))
         blood.active = true
         blood.getComponent(cc.ParticleSystem).resetSystem()

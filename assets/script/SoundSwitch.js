@@ -5,14 +5,14 @@ cc.Class({
     skinOff: cc.SpriteFrame
   },
 
-  onLoad: function () {
+  onLoad () {
     this._soundSwitch = true
     const e = cc.sys.localStorage.getItem('Shooter_Sound')
     this._soundSwitch = !e || e == 'true'
     this.updateStatus()
   },
 
-  trigger: function () {
+  trigger () {
     if (facade.FOR_DEVELOP) {
       const e = {
         game_id: window.facade.GameId,
@@ -21,6 +21,7 @@ cc.Class({
         record: '{}'
       }
       window.net.getComponent('Net').httpRequest(window.net.SaveRecord, e)
+
       const t = {
         game_id: window.facade.GameId,
         token: window.facade.getComponent('PlayerModel').token,
@@ -28,6 +29,7 @@ cc.Class({
         record: '{}'
       }
       window.net.getComponent('Net').httpRequest(window.net.SaveRecord, t)
+
       const n = {
         game_id: window.facade.GameId,
         token: window.facade.getComponent('PlayerModel').token,
@@ -36,16 +38,18 @@ cc.Class({
       }
       window.net.getComponent('Net').httpRequest(window.net.SaveRecord, n)
     }
-    this._soundSwitch = !this._soundSwitch, this.updateStatus()
-    const i = this._soundSwitch ? 'true' : 'false'
-    cc.sys.localStorage.setItem('Shooter_Sound', i)
+
+    this._soundSwitch = !this._soundSwitch
+    this.updateStatus()
+
+    cc.sys.localStorage.setItem('Shooter_Sound', this._soundSwitch ? 'true' : 'false')
   },
 
-  updateStatus: function () {
+  updateStatus () {
     audio.getComponent('SoundManager').setSoundEnabled(this._soundSwitch)
   },
 
-  update: function (e) {
+  update (e) {
     this.node.getComponent(cc.Sprite).spriteFrame = this._soundSwitch ? this.skinOn : this.skinOff
   }
 })

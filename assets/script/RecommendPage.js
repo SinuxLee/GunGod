@@ -6,19 +6,22 @@ cc.Class({
     content: cc.Node,
     gameRun: cc.Node
   },
-  show: function () {
-    this.content.y = 0, this.node.active = true
+
+  show () {
+    this.content.y = 0
+    this.node.active = true
   },
-  onEnable: function () {
+  onEnable () {
     this.initData()
   },
-  initData: function () {
-    const e = this
-    MoreGameManager.requestMoreGameList(function (t) {
-      e.showRecommendGameList(t)
+
+  initData () {
+    MoreGameManager.requestMoreGameList((t) => {
+      this.showRecommendGameList(t)
     })
   },
-  showRecommendGameList: function (e) {
+
+  showRecommendGameList (e) {
     if (this.content.removeAllChildren(), e && e.length != 0) {
       for (let t = 0; t < e.length; t++) {
         const n = cc.instantiate(this.itemPrefab)
@@ -30,8 +33,10 @@ cc.Class({
       this.content.height = 252 * e.length / 2
     }
   },
-  scrollEvent: function (e, t) {},
-  close: function () {
+
+  scrollEvent (e, t) {},
+
+  close () {
     this.node.active = false
   }
 })

@@ -4,24 +4,34 @@ cc.Class({
     color: 'y'
   },
 
-  setText: function (e) {
-    this._word != e && (this._word = e, cc.loader.getRes('uis', cc.SpriteAtlas) ? this.createWord() : cc.loader.loadRes('uis', cc.SpriteAtlas, this.loaded.bind(this)))
+  setText (word) {
+    if (this._word == word) return
+
+    this._word = word
+    const atlas = cc.loader.getRes('uis', cc.SpriteAtlas)
+    if (atlas) this.createWord()
+    else cc.loader.loadRes('uis', cc.SpriteAtlas, this.loaded.bind(this))
   },
 
-  loaded: function () {
+  loaded () {
     this.createWord()
   },
 
-  createWord: function () {
+  createWord () {
     this.node.removeAllChildren()
-    for (let e = this._word.split(''), t = e.length - 1; t >= 0; t--) {
-      const n = new cc.Node()
-      let i = e[t]
-      i == '+' ? i = 'plus' : i == '/' ? i = 'split' : i == ':' && (i = 'colon')
-      const o = cc.loader.getRes('uis', cc.SpriteAtlas)
-      n.addComponent(cc.Sprite).spriteFrame = o.getSpriteFrame('n' + this.color + '_' + i)
-      n.color = this.node.color
-      this.node.addChild(n)
+    const arr = this._word.split('')
+
+    for (let len = arr.length - 1; len >= 0; len--) {
+      const node = new cc.Node()
+      let char = arr[len]
+      if (char == '+') char = 'plus'
+      else if (char == '/') char = 'split'
+      else if (char == ':') char = 'colon'
+
+      const atlas = cc.loader.getRes('uis', cc.SpriteAtlas)
+      node.addComponent(cc.Sprite).spriteFrame = atlas.getSpriteFrame('n' + this.color + '_' + char)
+      node.color = this.node.color
+      this.node.addChild(node)
     }
   }
 })

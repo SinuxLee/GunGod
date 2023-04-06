@@ -8,37 +8,46 @@ cc.Class({
     recommendPre: cc.Prefab
   },
 
-  onEnable: function () {
+  onEnable () {
     cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4
   },
-  initRecommond: function () {},
-  init: function () {
+
+  initRecommond () {},
+
+  init () {
     this.rewardType = window.facade.getComponent('ShareADModel').getShareADType()
-    this.rewardType != 2 ? this.skipButton.spriteFrame = this.skipByVedioSkin : this.skipButton.spriteFrame = this.skipByShareSkin, this.initRecommond()
+    if (this.rewardType != 2) this.skipButton.spriteFrame = this.skipByVedioSkin
+    else this.skipButton.spriteFrame = this.skipByShareSkin
+    this.initRecommond()
   },
-  hide: function () {
+
+  hide () {
     this.node.parent.getComponent('LevelUI').hideSkip()
   },
-  onDisable: function () {
+
+  onDisable () {
     this.inited = false
-    cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1
-    cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = true
+    const bar = cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar')
+    bar.zIndex = 1
+    bar.active = true
   },
-  skip: function () {
+
+  skip () {
     if (!facade.isMiniGame) {
       this.hide()
       cc.systemEvent.emit(ModuleEventEnum.SKIP)
       return
     }
+
     if (this.rewardType > 2) popUp.getComponent('FloatTip').showTip('已经超出今天的跳关上限啦！')
     else {
-      const e = {
+      const param = {
         inviteId: 1528,
         videoId: 21102,
         assistId: 0,
         interstitalId: 31102
       }
-      window.facade.getComponent('ShareADModel').showShareAD(e, {
+      window.facade.getComponent('ShareADModel').showShareAD(param, {
         succ: function (e) {
           console.log('跳关分享成功:', e)
           this.hide()

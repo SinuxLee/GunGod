@@ -23,7 +23,7 @@ cc.Class({
     window.facade.getComponent('GameModel').passLevelCount = 0
   },
 
-  takeAward() {
+  takeAward () {
     const data = {
       inviteId: 1536,
       videoId: 21108,
@@ -40,7 +40,7 @@ cc.Class({
     })
   },
 
-  takeAwardSuccess() {
+  takeAwardSuccess () {
     window.facade.getComponent('GameModel').takeAdvanceReward()
     window.facade.getComponent('GameModel').newerRewardCancelCount--
     popUp.getComponent('Pop').removeTop()

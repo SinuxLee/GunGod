@@ -6,7 +6,8 @@ cc.Class({
     content: cc.Node,
     recommendPre: cc.Prefab
   },
-  onLoad: function () {
+
+  onLoad () {
     const e = this
     this.frameCount = 0
     if (facade.isMiniGame) {
@@ -45,31 +46,40 @@ cc.Class({
       })
     }
   },
-  onEnable: function () {
+
+  onEnable () {
     cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4
   },
-  onDisable: function () {
+
+  onDisable () {
     cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1
   },
-  initData: function (e) {
+
+  initData (e) {
     window.facade.getComponent('GameModel').setOpenRankfFlag(2)
   },
-  start: function () {
+
+  start () {
     window.facade.getComponent('RankModel').requestRankList(1)
   },
-  doClose: function () {
+
+  doClose () {
     cc.systemEvent.off(ModuleEventEnum.RANK_LIST, this.gotRank, this)
   },
-  gotRank: function (e) {
+
+  gotRank (e) {
     for (let t = 0; t < e.length; t++) e[t].rankNo = t + 1
     this.scroll.getComponent('ListViewCtrl').setList(e, false, null)
   },
-  close: function () {
+
+  close () {
     window.popUp.getComponent('Pop').removeTop()
   },
-  jumpTadayRank: function () {
+
+  jumpTadayRank () {
     window.popUp.getComponent('Pop').removeTop()
     window.popUp.getComponent('Pop').addPopByName('GunMasterRank', this, true, true, false)
   },
+
   setupList: function (e) {}
 })

@@ -55,7 +55,7 @@ cc.Class({
       this.bannerAd.onError(function (t) {
         e.bannerAd = null
       })
-      
+
       this.bannerAd.onResize(function (t) {
         e.bannerHeight = t.height
         facade.Screenratio && 1 / facade.Screenratio > 2.06 ? window.facade.bannerHeight = 2 * (t.height + 15 + 20) + 30 : window.facade.bannerHeight = 2 * (t.height + 20)

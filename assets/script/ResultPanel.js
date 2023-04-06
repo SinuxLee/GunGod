@@ -1,5 +1,6 @@
 const ModuleEventEnum = require('ModuleEventEnum')
-const o = require('AnalyticsUtilities').AnalyticsUtilities
+const Analytics = require('AnalyticsUtilities').AnalyticsUtilities
+
 cc.Class({
   extends: cc.Component,
   properties: {
@@ -37,19 +38,22 @@ cc.Class({
     bigRetrySkin: cc.SpriteFrame
   },
 
-  start: function () {
+  start () {
     window.facade.Screenratio && window.facade.Screenratio < 0.47 ? this.skipBtn.parent.getComponent(cc.Widget).bottom = 200 : this.skipBtn.parent.getComponent(cc.Widget).bottom = 10, this.skipBtn.parent.getComponent(cc.Widget).updateAlignment()
   },
-  onEnable: function () {
+
+  onEnable () {
     this.losePlayed = false
     this.replayPanel.active = false
     this.recommendPage.active = true
   },
-  onDisable: function () {
+
+  onDisable () {
     this.losePlayed = false
     this.replayPanel.active = false
   },
-  init: function (e) {
+
+  init (e) {
     this.passNode.active = false
     this.failNode.active = false
     this.goNextBtn.parent.active = false
@@ -67,30 +71,91 @@ cc.Class({
     this.updateRewardType()
     this.initResult()
     this.initLinks()
-    o.logEvent('进入结算界面')
+    Analytics.logEvent('进入结算界面')
   },
-  updateRewardType: function () {
+
+  updateRewardType () {
     this.rewardType = window.facade.getComponent('ShareADModel').getShareADType()
-    this.rewardType != 2 ? (this.skipBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin, this.upBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin, this.doubleBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin, this.restartBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin, this.type = 'Video') : (this.skipBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin, this.upBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin, this.doubleBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin, this.restartBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin, this.type = 'Share')
+    if (this.rewardType != 2) {
+      this.skipBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin
+      this.upBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin
+      this.doubleBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin
+      this.restartBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconVideoSkin
+      this.type = 'Video'
+    } else {
+      this.skipBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin
+      this.upBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin
+      this.doubleBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin
+      this.restartBtn.getChildByName('icon').getComponent(cc.Sprite).spriteFrame = this.iconShareSkin
+      this.type = 'Share'
+    }
   },
-  initResult: function () {
+
+  initResult () {
     this.passNode.active = true
     this.failNode.active = false
     this.resultLabel.active = false
-    this._passed ? (o.logEvent('进入闯关成功界面: ' + window.facade.getComponent('LevelModel').playingLevel), this.reward.getComponent('TextureLabel').setText('0'), this.star1.getChildByName('light').active = false, this.star2.getChildByName('light').active = false, this.star3.getChildByName('light').active = false, this.reward.parent.opacity = 0, this.node.runAction(cc.sequence(cc.delayTime(0.03), cc.callFunc(this.showResult, this)))) : this.initFailed()
+    if (this._passed) {
+      Analytics.logEvent('进入闯关成功界面: ' + window.facade.getComponent('LevelModel').playingLevel)
+      this.reward.getComponent('TextureLabel').setText('0')
+      this.star1.getChildByName('light').active = false
+      this.star2.getChildByName('light').active = false
+      this.star3.getChildByName('light').active = false
+      this.reward.parent.opacity = 0
+      this.node.runAction(cc.sequence(cc.delayTime(0.03), cc.callFunc(this.showResult, this)))
+    } else this.initFailed()
   },
-  initFailed: function () {
-    this.losePlayed || (window.audio.getComponent('SoundManager').playEffect('lose'), this.losePlayed = true), o.logEvent('进入闯关失败界面: ' + window.facade.getComponent('LevelModel').playingLevel), this.passNode.active = false, this.failNode.active = true, this.goNextBtn.active = false, this.restartLabel.active = false, this.upBtn.active = false, this.doubleBtn.active = false, this.restartBtn.active = true, this.skipBtn.active = true
-    const e = this
-    e.retryCostEnergy.active = false
-    setTimeout(function () {
-      e.retryCostEnergy.active = true
-    }, 2e3)
+
+  initFailed () {
+    if (!this.losePlayed) {
+      window.audio.getComponent('SoundManager').playEffect('lose')
+      this.losePlayed = true
+    }
+
+    Analytics.logEvent('进入闯关失败界面: ' + window.facade.getComponent('LevelModel').playingLevel)
+
+    this.passNode.active = false
+    this.failNode.active = true
+    this.goNextBtn.active = false
+    this.restartLabel.active = false
+    this.upBtn.active = false
+    this.doubleBtn.active = false
+    this.restartBtn.active = true
+    this.skipBtn.active = true
+
+    this.retryCostEnergy.active = false
+    setTimeout(() => {
+      this.retryCostEnergy.active = true
+    }, 2000)
+
     facade.getComponent('LevelModel').costEnergy
     this.retryCostEnergy.active = true
     this.retryCostEnergy.getComponent(cc.Label).string = '消耗1体力重玩'
     this.goNextBtn.parent.active = true
-    window.facade.Screenratio && window.facade.Screenratio < 0.47 ? this.failNode.getComponent(cc.Widget).bottom = 381 : this.failNode.getComponent(cc.Widget).bottom = 170, this.failNode.getComponent(cc.Widget).updateAlignment(), facade.SAVE_MODE ? (this.skipBtn.active = false, this.restartBtn.getComponent(cc.Widget).isAlignHorizontalCenter = true, this.restartBtn.getComponent(cc.Widget).isAlignRight = false, this.restartBtn.getComponent(cc.Widget).isAlignLeft = false, this.restartBtn.getComponent(cc.Widget).horizontalCenter = 0, this.restartBtn.getComponent(cc.Widget).updateAlignment()) : (this.restartBtn.getComponent(cc.Sprite).spriteFrame = this.bigRetrySkin, this.restartBtn.getComponent(cc.Widget).isAlignRight = false, this.restartBtn.getComponent(cc.Widget).isAlignLeft = true, this.restartBtn.getComponent(cc.Widget).left = 50, this.restartBtn.getComponent(cc.Widget).updateAlignment(), this.skipBtn.width = 205, this.skipBtn.getComponent(cc.Sprite).spriteFrame = this['btn' + this.type + 'Skin'], this.skipBtn.getComponent(cc.Widget).right = 50, this.skipBtn.getComponent(cc.Widget).updateAlignment()), this.checkLast()
+    if (window.facade.Screenratio && window.facade.Screenratio < 0.47) {
+      this.failNode.getComponent(cc.Widget).bottom = 381
+    } else {
+      this.failNode.getComponent(cc.Widget).bottom = 170
+      this.failNode.getComponent(cc.Widget).updateAlignment()
+      if (facade.SAVE_MODE) {
+        this.skipBtn.active = false, this.restartBtn.getComponent(cc.Widget).isAlignHorizontalCenter = true
+        this.restartBtn.getComponent(cc.Widget).isAlignRight = false
+        this.restartBtn.getComponent(cc.Widget).isAlignLeft = false
+        this.restartBtn.getComponent(cc.Widget).horizontalCenter = 0
+        this.restartBtn.getComponent(cc.Widget).updateAlignment()
+      } else {
+        this.restartBtn.getComponent(cc.Sprite).spriteFrame = this.bigRetrySkin
+        this.restartBtn.getComponent(cc.Widget).isAlignRight = false
+        this.restartBtn.getComponent(cc.Widget).isAlignLeft = true
+        this.restartBtn.getComponent(cc.Widget).left = 50
+        this.restartBtn.getComponent(cc.Widget).updateAlignment()
+        this.skipBtn.width = 205
+        this.skipBtn.getComponent(cc.Sprite).spriteFrame = this['btn' + this.type + 'Skin']
+        this.skipBtn.getComponent(cc.Widget).right = 50
+        this.skipBtn.getComponent(cc.Widget).updateAlignment()
+      }
+      this.checkLast()
+    }
   },
   initNeedUp: function () {
     this.updateRewardType()
@@ -107,6 +172,7 @@ cc.Class({
     }, 2e3)
     this.goNextBtn.active = true
     this.upBtn.active = true
+
     this.goNextBtn.parent.active = true
     this.goNextBtn.width = 205
     this.goNextBtn.getComponent(cc.Sprite).spriteFrame = this.btnNextSkin
@@ -114,12 +180,14 @@ cc.Class({
     this.goNextBtn.getComponent(cc.Widget).isAlignLeft = true
     this.goNextBtn.getComponent(cc.Widget).left = 50
     this.goNextBtn.getComponent(cc.Widget).updateAlignment()
+
     this.upBtn.getComponent(cc.Sprite).spriteFrame = this['big' + this.type + 'Skin']
     this.upBtn.getComponent(cc.Widget).right = 50
     this.upBtn.getComponent(cc.Widget).updateAlignment()
     this.checkLast()
   },
-  initDefault: function () {
+
+  initDefault () {
     this.updateRewardType()
     this.passNode.active = true
     this.failNode.active = false
@@ -141,7 +209,8 @@ cc.Class({
     this.restartBtn.getComponent(cc.Widget).updateAlignment()
     this.checkLast()
   },
-  initDouble: function () {
+
+  initDouble () {
     this.updateRewardType()
     this.passNode.active = true
     this.failNode.active = false
@@ -162,19 +231,24 @@ cc.Class({
     this.doubleBtn.getComponent(cc.Widget).updateAlignment()
     this.checkLast()
   },
-  checkLast: function () {
+
+  checkLast () {
     window.facade.getComponent('LevelModel').isLastLevel() && (this.goNextBtn.active = false, this.skipBtn.active = false)
   },
-  initLinks: function () {
+
+  initLinks () {
     facade.SAVE_MODE ? this.linkBox.active = false : window.facade.getComponent('RecommendGameModel').requestResultRecommend()
   },
-  showResult: function () {
+
+  showResult () {
     window.facade.Screenratio && window.facade.Screenratio < 0.47 ? this.passNode.getComponent(cc.Widget).bottom = 580 : this.passNode.getComponent(cc.Widget).bottom = 380, this.passNode.getComponent(cc.Widget).updateAlignment(), this.star = window.facade.getComponent('LevelModel').star, this.star < 3 && this.initNeedUp(), this.star <= 0 ? this.showTitle() : (this.starIndex = 1, this.node.runAction(cc.sequence(cc.repeat(cc.sequence(cc.callFunc(this.addStar.bind(this)), cc.delayTime(0.5)), this.star), cc.delayTime(0.5), cc.callFunc(this.showTitle, this))))
   },
-  showTitle: function () {
+
+  showTitle () {
     this.checkGfit()
   },
-  addStar: function () {
+
+  addStar () {
     const e = this['star' + this.starIndex].getChildByName('light')
     e.active = true, e.opacity = 0, e.scale = 0
     const t = cc.spawn(cc.fadeIn(0.4), cc.scaleTo(0.4, 1))
@@ -183,7 +257,8 @@ cc.Class({
     window.audio.getComponent('SoundManager').playEffect('star')
     this.starIndex >= 3 && (this.reward.parent.opacity = 255, this.reward.parent.getChildByName('moneyEffect').getComponent(cc.ParticleSystem).resetSystem(), this.rewardCash = window.facade.getComponent('LevelModel').playingLevelConfig.Reward, this.reward.getComponent('TextureLabel').setText('+' + this.rewardCash), window.facade.getComponent('GameModel').addCash(Number(this.rewardCash)), this.initDouble()), this.starIndex++
   },
-  goNext: function () {
+
+  goNext () {
     this.goNextBtn.getComponent(cc.Button).interactable = false
     const e = facade.getComponent('LevelModel').getTotalStar()
     const t = facade.getComponent('LevelModel').getLevelConfig(window.facade.getComponent('LevelModel').playingLevel + 1)
@@ -195,9 +270,10 @@ cc.Class({
         this.goNextBtn.getComponent(cc.Button).interactable = true
       }.bind(this))))
     }
-    t.Star > e ? popUp.getComponent('FloatTip').showTip('收集' + t.Star + '颗星星解锁下一关') : (cc.systemEvent.emit(ModuleEventEnum.GO_NEXT), o.logEvent('闯关成功点击下一关'))
+    t.Star > e ? popUp.getComponent('FloatTip').showTip('收集' + t.Star + '颗星星解锁下一关') : (cc.systemEvent.emit(ModuleEventEnum.GO_NEXT), Analytics.logEvent('闯关成功点击下一关'))
   },
-  watchVideo: function () {
+
+  watchVideo () {
     const e = {
       inviteId: 0,
       videoId: 21111,
@@ -213,7 +289,8 @@ cc.Class({
       }
     })
   },
-  jumpToLevlUi: function () {
+
+  jumpToLevlUi () {
     window.facade.getComponent('LevelModel').setOverVideo()
     const e = facade.getComponent('LevelModel').getLevelConfig(window.facade.getComponent('LevelModel').playingLevel + 1)
     if (facade.getComponent('LevelModel').costEnergy = 1, e.BonusType == 1) {
@@ -225,13 +302,16 @@ cc.Class({
     const n = facade.getComponent('LevelModel').getTotalStar()
     e.Star > n ? popUp.getComponent('FloatTip').showTip('收集' + e.Star + '颗星星解锁下一关') : cc.systemEvent.emit(ModuleEventEnum.GO_NEXT)
   },
-  onRetryLabelHandler: function () {
-    this.replayPanel.active = true, o.logEvent('闯关成功点击重玩')
+
+  onRetryLabelHandler () {
+    this.replayPanel.active = true, Analytics.logEvent('闯关成功点击重玩')
   },
-  onRetry: function () {
+
+  onRetry () {
     this.doRetry()
   },
-  doRetry: function () {
+
+  doRetry () {
     const e = {
       inviteId: 0,
       videoId: 21113,
@@ -247,17 +327,19 @@ cc.Class({
       fail: function (e, t) {
         popUp.getComponent('FloatTip').showTip(e)
       }
-    }), o.logEvent('体力不足界面看视频或分享')
+    }), Analytics.logEvent('体力不足界面看视频或分享')
   },
-  doRetryCostEnergy: function () {
+
+  doRetryCostEnergy () {
     this.restartBtn.getComponent(cc.Button).interactable = false
     this.restartLabel.getComponent(cc.Button).interactable = false
     this.retryCostEnergy.getComponent(cc.Button).interactable = false
     window.facade.getComponent('GameModel').levelRetryTouch = true
     this.node.parent.getComponent('LevelUI').retryCostEnergy()
-    o.logEvent('闯关失败点击消耗体力')
+    Analytics.logEvent('闯关失败点击消耗体力')
   },
-  onTake3Star: function () {
+
+  onTake3Star () {
     if (facade.isMiniGame) {
       if (this.rewardType > 2) popUp.getComponent('FloatTip').showTip('已经超出今天的奖励上限啦！')
       else {
@@ -278,16 +360,19 @@ cc.Class({
       }
     } else this.take3Star()
   },
-  take3Star: function () {
+
+  take3Star () {
     this.upBtn.getComponent(cc.Button).interactable = false
     window.facade.getComponent('LevelModel').force3Star()
     this.showResult()
   },
-  take3StarGet: function () {
+
+  take3StarGet () {
     window.facade.getComponent('LevelModel').force3Star()
     this.showResult()
   },
-  skip: function () {
+
+  skip () {
     if (!facade.isMiniGame) return this.hide(), void cc.systemEvent.emit(ModuleEventEnum.SKIP)
     if (this.rewardType > 2) popUp.getComponent('FloatTip').showTip('已经超出今天的跳关上限啦！')
     else {
@@ -309,7 +394,8 @@ cc.Class({
       })
     }
   },
-  onDouble: function () {
+
+  onDouble () {
     if (facade.isMiniGame) {
       if (this.rewardType > 2) popUp.getComponent('FloatTip').showTip('已经超出今天的奖励上限啦！')
       else {
@@ -330,7 +416,8 @@ cc.Class({
       }
     } else this.takeDouble()
   },
-  takeDouble: function () {
+
+  takeDouble () {
     this.doubleBtn.getComponent(cc.Button).interactable = false
     this.reward.parent.opacity = 255
     this.reward.parent.getChildByName('moneyEffect').getComponent(cc.ParticleSystem).resetSystem()
@@ -339,12 +426,14 @@ cc.Class({
     this.reward.getComponent('TextureLabel').setText('+' + e)
     window.facade.getComponent('GameModel').addCash(Number(4 * this.rewardCash))
   },
-  hide: function () {
+
+  hide () {
     cc.systemEvent.off(ModuleEventEnum.RESULT_RECOMMEND, this.gotLinks, this)
     this.node.active = false
     this.restartLabel.active = this.retryCostEnergy.active = false
   },
-  gotLinks: function (e) {
+
+  gotLinks (e) {
     if (this.linkBox.removeAllChildren(), !e || e.length == 0) return this.linkBox.opacity = 0, void (this.linkBox.active = false)
     if (this.linkBox.opacity = 255, this.linkBox.active = true, window.facade.getComponent('PlayerModel').isClickCountLimit(3)) { for (let t = 0; t < e.length; t++) e[t].navout_max_cnt && e[t].navout_max_cnt != '' && Number(e[t].navout_max_cnt) != 0 && e[t].navout_cnt >= Number(e[t].navout_max_cnt) && (e.splice(t, 1), t--) }
     if (facade.getComponent('PlayerModel').isIconRandomOrder('result')) {
@@ -365,7 +454,7 @@ cc.Class({
     }
   },
 
-  checkGfit: function () {
+  checkGfit () {
     if (!facade.SAVE_MODE) {
       const e = facade.getComponent('GameModel').checkNewerShowCondtition()
       e != 0 && window.popUp.getComponent('Pop').addPopByName(e + 'View', null, true, true)

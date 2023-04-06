@@ -11,14 +11,15 @@ cc.Class({
     rankImgLay: cc.Node,
     cashLabel: cc.Label
   },
-  onLoad: function () {
+
+  onLoad () {
     this.frameCount = 0
   },
 
-  initRecommond: function () {},
-  close: function () {},
-  onDisable: function () {},
-  cutNick: function (e) {
+  initRecommond () {},
+  close () {},
+
+  cutNick (e) {
     for (var t = '', n = 0, i = 0; i < e.length; i++) {
       if (e.charCodeAt(i) > 127 || e.charCodeAt(i) == 94 ? n += 2 : n++, t += e[i], n >= 5) {
         t += '...'
@@ -26,7 +27,8 @@ cc.Class({
       }
     } return t
   },
-  setItemData: function (e, t, n, i) {
+
+  setItemData (e, t, n, i) {
     this.itemID = t
     this.nameL.string = this.cutNick(n.nick_name)
     console.log('rank sign:', n)
@@ -53,7 +55,8 @@ cc.Class({
     const o = this.getRankCashNum(n.rankNo)
     this.cashLabel.string = '+' + o, i == 2 ? this.starL.getComponent('TextureLabel').setText(String(n.today_best_score)) : this.starL.getComponent('TextureLabel').setText(String(n.best_score))
   },
-  getRankCashNum: function (e) {
+
+  getRankCashNum (e) {
     if (e == 0) return 0
     for (var t = facade.getComponent('ShareADModel').GameConfig.RankReward.Value.split(','), n = 0, i = 0; i < t.length; i++) {
       if (e <= t[i].split(':')[0]) {
@@ -63,7 +66,8 @@ cc.Class({
     }
     return n
   },
-  setSelfItem: function (e) {
+
+  setSelfItem (e) {
     const t = e
     this.nameL.string = this.cutNick(t.nick_name)
     console.log('rank sign:', t)
@@ -92,7 +96,8 @@ cc.Class({
     const n = this.getRankCashNum(t.rank_order)
     this.cashLabel.string = '+' + n, t.best_score && this.starL.getComponent('TextureLabel').setText(String(t.best_score))
   },
-  loadHead: function (e) {
+
+  loadHead (e) {
     textureManager.getComponent('TextureManager').getTextureOneByOne(e, this.head)
   }
 })

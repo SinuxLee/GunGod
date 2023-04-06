@@ -2,8 +2,8 @@ const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
 
-  initConfig: function () {},
-  onLoad: function () {
+  initConfig () {},
+  onLoad () {
     if (facade.isMiniGame) {
       this.userObject = null
       this.rewardTplId = null
@@ -16,7 +16,8 @@ cc.Class({
       cc.systemEvent.on(ModuleEventEnum.INIT_ROLEINFO_COMPLETED, this.onRoleInfo, this)
     }
   },
-  onGotToken: function () {
+
+  onGotToken () {
     const e = {
       game_id: window.facade.GameId,
       token: this.token

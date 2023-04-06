@@ -3,7 +3,7 @@ const VirBannerCtrl = require('VirBannerCtrl')
 cc.Class({
   extends: cc.Component,
 
-  onLoad: function () {
+  onLoad () {
     this.loadedKeys = {}
     this.popList = []
     this.modeShowed = false
@@ -21,13 +21,14 @@ cc.Class({
       Claim: 1
     }
   },
-  reset: function () {
+
+  reset () {
     this.removeAll()
     this.popList = []
     this.modeShowed = false
   },
 
-  addAlert: function (e, t, n, i) {
+  addAlert (e, t, n, i) {
     const o = {
       detailString: e,
       enterCallBack: t,
@@ -36,19 +37,23 @@ cc.Class({
     }
     this.addPopByName('Alert', o, true, true)
   },
-  addGuide: function (e) {
+
+  addGuide (e) {
     this.addPopByName('Guide', e, false, false)
   },
-  showCurtainIn: function () {
+
+  showCurtainIn () {
     this._curtainType = 'in'
     this.curtainDeal()
   },
-  showCurtainOut: function (e) {
+
+  showCurtainOut (e) {
     this._curtainType = 'out'
     this._curtainOutFunc = e
     this.curtainDeal()
   },
-  curtainDeal: function () {
+
+  curtainDeal () {
     this.changeAniName = 'spine/zhuanchang'
     window.facade.deviceLow && (this.changeAniName = 'spine_low/zhuanchang_low')
     if (cc.loader.getRes(this.changeAniName, sp.SkeletonData)) {
@@ -60,11 +65,13 @@ cc.Class({
       }.bind(this))
     }
   },
-  curtianEnded: function () {
+
+  curtianEnded () {
     this.curtainAnimate.getComponent(sp.Skeleton).setCompleteListener(null)
     this._curtainType == 'out' && this._curtainOutFunc ? (this._curtainOutFunc(), this._curtainOutFunc = null) : (this.curtainAnimate.removeFromParent(), this.curtainAnimate = null)
   },
-  curtainResDeal: function (e) {
+
+  curtainResDeal (e) {
     (e = this.curtainRes)
     this.curtainRes = e
     this.curtainAnimate = new cc.Node()
@@ -80,7 +87,8 @@ cc.Class({
     } else this.curtainAnimate.getComponent(sp.Skeleton).setAnimation(0, 'play2', false)
     this.curtainAnimate.getComponent(sp.Skeleton).setCompleteListener(this.curtianEnded.bind(this))
   },
-  addPopByName: function (e, t, n, i, o, a, s) {
+
+  addPopByName (e, t, n, i, o, a, s) {
     console.log('addPopByName:', e), this._tempDatas || (this._tempDatas = {}), this._tempDatas[e] = null, this.loadingUrls || (this.loadingUrls = {})
     for (let c = 0; c < this.popList.length; c++) {
       if (this.popList[c].getName() == e) {

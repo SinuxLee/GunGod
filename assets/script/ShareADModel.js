@@ -1,8 +1,8 @@
 const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
-  properties: {},
-  onLoad: function () {
+
+  onLoad () {
     this.dayId = 1
     this.shareCount = 0
     this.videoCount = 0
@@ -21,23 +21,42 @@ cc.Class({
       cc.systemEvent.on(ModuleEventEnum.WX_HIDE, this.onWxHide.bind(this))
     }
   },
-  initConfig: function () {
+
+  initConfig () {
     cc.loader.loadResArray(['config/ASOrderConfig', 'config/ASRuleConfig', 'config/GameConfig'], cc.JsonAsset, this.configLoaded.bind(this))
   },
-  httpResDeal2: function (e) {
-    let t;
-    (e = e.data) && e.invite_newbie && (this.newerCount = e.invite_newbie.length, this.newbieList = e.invite_newbie, this.newbieList && this.newbieList.length > 1 && (t = this.sortList(this.newbieList, 'newbieFetchList')), this.generateOrder(), cc.systemEvent.emit(ModuleEventEnum.GAME_OPEN_NEWBIE_INVITE, t))
-    e && e.invite_alive && (this.activityCount = e.invite_alive.length, this.activityList = e.invite_alive, this.generateOrder(), cc.systemEvent.emit(ModuleEventEnum.GAME_OPEN_DAILY_INVITE, this.activityList))
+
+  httpResDeal2 (res) {
+    let t
+    res = res.data
+    if (res && res.invite_newbie) {
+      this.newerCount = res.invite_newbie.length
+      this.newbieList = res.invite_newbie
+      if (this.newbieList && this.newbieList.length > 1) {
+        t = this.sortList(this.newbieList, 'newbieFetchList')
+      }
+      this.generateOrder()
+      cc.systemEvent.emit(ModuleEventEnum.GAME_OPEN_NEWBIE_INVITE, t)
+    }
+
+    if (res && res.invite_alive) {
+      this.activityCount = res.invite_alive.length
+      this.activityList = res.invite_alive
+      this.generateOrder()
+      cc.systemEvent.emit(ModuleEventEnum.GAME_OPEN_DAILY_INVITE, this.activityList)
+    }
   },
-  httpResDeal: function (e) {
-    if (e && e.record) {
-      const t = JSON.parse(e.record)
-      console.log('ShareADModel data:', t)
-      this.dayCheck(t)
+
+  httpResDeal (res) {
+    if (res && res.record) {
+      const record = JSON.parse(res.record)
+      console.log('ShareADModel data:', record)
+      this.dayCheck(record)
       this.saveRecord()
     }
   },
-  sortList: function (e, t) {
+
+  sortList (e, t) {
     for (var n = [], i = facade.getComponent('GameModel')[t], o = 0; o < e.length; o++) {
       for (let a = 0; a < i.length && i[a].user_id != e[o].user_id; a++);
       n.push(e[o])
@@ -46,11 +65,13 @@ cc.Class({
       return e.add_ts > t.add_ts ? 1 : -1
     }), n
   },
-  getLocalTime: function () {
-    const e = new Date()
-    return e.getTime() - 6e4 * e.getTimezoneOffset()
+
+  getLocalTime () {
+    const now = new Date()
+    return now.getTime() - 6e4 * now.getTimezoneOffset()
   },
-  dayCheck: function (e) {
+
+  dayCheck (e) {
     this.lastLoginTime = Number(e.lastLoginTime)
     this.dayId = Number(e.dayId)
     this.loginCount = Number(e.loginCount)
@@ -73,7 +94,8 @@ cc.Class({
     this.generateOrder()
     cc.systemEvent.emit(ModuleEventEnum.LOGININFO_GOT)
   },
-  generateOrder: function () {
+
+  generateOrder () {
     if (this.GameConfig) {
       this.activityCount || (this.activityCount = 0), this.newerCount || (this.newerCount = 0)
       let e = this.dayId - 1
@@ -106,7 +128,8 @@ cc.Class({
       }
     }
   },
-  getRulesId: function (e, t) {
+
+  getRulesId (e, t) {
     for (var n = [], i = 1; i <= 3; i++) {
       for (var o = this.asRules['type_' + i], a = 0, s = 0; s < o.length; s++) {
         let c = 0
@@ -118,7 +141,8 @@ cc.Class({
     for (i = 0; i < n.length; i++) r += '_' + n[i]
     return r
   },
-  saveRecord: function () {
+
+  saveRecord () {
     if (facade.CurrentScene != 'SkipPage') {
       const e = {}
       e.dayId = this.dayId
@@ -139,7 +163,8 @@ cc.Class({
       window.net.getComponent('Net').httpRequest(window.net.SaveRecord, t)
     }
   },
-  configLoaded: function (e, t) {
+
+  configLoaded (e, t) {
     for (let n = 0; n < t.length; n++) t[n].name == 'ASOrderConfig' ? this.ASOrderConfig = t[n].json : t[n].name == 'ASRuleConfig' ? this.ASRuleConfig = t[n].json : t[n].name == 'GameConfig' && (this.GameConfig = t[n].json)
     if (this.GameConfig && (this.headOrderIds = this.GameConfig.Day_1_AS_Order.Value.split(':')[0].split(','), this.loopOrderIds = this.GameConfig.Day_1_AS_Order.Value.split(':')[1].split(','), this.maxADCount = Number(this.GameConfig.VideoLimit.Value), this.maxShareCount = Number(this.GameConfig.ShareLimit.Value), facade.getComponent('LevelModel').vipStarNeed = Number(this.GameConfig.VipUnlockLevel.Value), facade.getComponent('LevelModel').injuryStarNeed = Number(this.GameConfig.InjuryUnlockLevel.Value), facade.getComponent('LevelModel').gndStarNeed = Number(this.GameConfig.GrenadegrUnlockLevel.Value)), this.ASRuleConfig) {
       for (const i in this.asRules = {}, this.ASRuleConfig) {
@@ -153,7 +178,8 @@ cc.Class({
     }
     this.generateOrder()
   },
-  getShareADType: function () {
+
+  getShareADType () {
     console.log('lc shareAD-- 分享次数 = ', this.dayShareCount)
     console.log('lc shareAD-- 视频次数 = ', this.dayADCount)
     console.log('lc shareAD-- 分享视频合体 次数 =', this.dayShareADCount)
@@ -166,13 +192,16 @@ cc.Class({
     }
     return e == 1 ? this.dayADCount < this.maxADCount ? (console.log('lc shareAD-- type 随机：看视频', this.dayADCount, this.maxADCount), 1) : this.dayShareCount < this.maxShareCount ? (console.log('lc shareAD-- type 随机： 视频看完 去分享', this.dayShareCount, this.maxShareCount), 2) : (console.log('lc shareAD-- type 随机： 视频看完 分享超过次数', this.dayShareCount, this.dayADCount), 3) : e == 2 ? this.dayShareCount < this.maxShareCount ? (console.log('lc shareAD-- type 随机： 去分享', this.dayShareCount, this.maxShareCount), 2) : this.dayADCount < this.maxADCount ? (console.log('lc shareAD-- type 随机：分享次数完成 去看视频', this.dayADCount, this.maxADCount), 1) : (console.log('lc shareAD-- type 随机：分享超过次数， 视频看完 ', this.dayShareCount, this.dayADCount), 3) : e
   },
-  clientTimeStamp: function () {
+
+  clientTimeStamp () {
     return (new Date()).getTime()
   },
-  showShareAD: function (e, t) {
+
+  showShareAD (e, t) {
     (this.callback = t, this.type = e, facade.isMiniGame) ? this.setupShareInfo(t) : t.succ(e)
   },
-  setupVideoInfo: function () {
+
+  setupVideoInfo () {
     const e = this
     this.gameVideo == null
       ? (console.log('lc shareAD--  初始化 gameVideo'), this.sendMggfBehaveReport(1, 1), this.gameVideo = wx.createRewardedVideoAd({
@@ -195,7 +224,8 @@ cc.Class({
       e.setupShareInfo(null)
     }), this.dayADCount++, this.videoCount++, this.dayShareADCount++, this.saveRecord()
   },
-  setupShareInfo: function () {
+
+  setupShareInfo () {
     const e = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : null
     let t = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : ''
     let n = arguments.length > 2 && void 0 !== arguments[2] ? arguments[2] : ''
@@ -255,7 +285,8 @@ cc.Class({
       cancel: function (e) {}
     }), this.dayShareCount++, this.shareCount++, this.dayShareADCount++, this.saveRecord()
   },
-  onWxRegistered: function () {
+
+  onWxRegistered () {
     this.initDefaultShare()
     this.requestOnlineInfo()
     this.reportInviteInfo()
@@ -263,14 +294,16 @@ cc.Class({
     this.saveRecord()
     cc.systemEvent.emit(ModuleEventEnum.LOGININFO_GOT)
   },
-  requestInvitee: function () {
+
+  requestInvitee () {
     const e = {
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token
     }
     window.net.getComponent('Net').httpRequest(window.net.InviteeList, e)
   },
-  requestOnlineInfo: function () {
+
+  requestOnlineInfo () {
     const e = {
       game_id: window.facade.GameId,
       token: window.facade.getComponent('PlayerModel').token,
@@ -280,16 +313,18 @@ cc.Class({
     let n = 0
     for (const i in e) n > 0 && (t += '&'), n++, t += i + '=' + e[i]
     const o = window.facade.httpServerAdress + window.net.GetRecord
-    const a = new XMLHttpRequest()
-    a.onreadystatechange = function () {
-      a.readyState == 4 && a.status == 200 && this.httpResDeal(JSON.parse(a.responseText).data)
+
+    const request = new XMLHttpRequest()
+    request.onreadystatechange = function () {
+      request.readyState == 4 && request.status == 200 && this.httpResDeal(JSON.parse(request.responseText).data)
     }.bind(this)
-    a.onerror = function (e) {}
-    a.open('POST', o, true)
-    a.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-    a.send(t)
+    request.onerror = function (e) {}
+    request.open('POST', o, true)
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    request.send(t)
   },
-  reportInviteInfo: function () {
+
+  reportInviteInfo () {
     const e = window.facade.getComponent('PlayerModel').wxAdaptor.getinviteRid()
     const t = window.facade.getComponent('PlayerModel').wxAdaptor.getinviteType()
     const n = {
@@ -300,10 +335,12 @@ cc.Class({
     }
     window.net.getComponent('Net').httpRequest(window.net.AcceptInvite, n)
   },
-  countWhetherShare: function () {
+
+  countWhetherShare () {
     return true
   },
-  getShareConfig: function (e) {
+
+  getShareConfig (e) {
     this.shareConfig = [{
       count: 1,
       random: 0
@@ -332,28 +369,34 @@ cc.Class({
       random: 1e4
     }
   },
-  getShareCount: function () {
+
+  getShareCount () {
     let e = cc.sys.localStorage.getItem('ShareFailCount')
     return e || (e = 0), console.log('lc shareAD-- getShareErrCount = ', e), e
   },
-  saveShareFailCount: function (e) {
+
+  saveShareFailCount (e) {
     if (e == 0) cc.sys.localStorage.setItem('ShareFailCount', 0)
     else {
       let t = cc.sys.localStorage.getItem('ShareFailCount')
       t || (t = 0), t += 1, console.log('lc shareAD-- saveShareErrCount = ', t), cc.sys.localStorage.setItem('ShareFailCount', t)
     }
   },
-  initDefaultShare: function () {
+
+  initDefaultShare () {
     wx.onShareAppMessage(function () {
       return {
         title: '开局一条命一把98K，你能闯多少关',
         imageUrl: 'https://gcdn.qdos.com/game/common/file/201911061730043511/ab12312.png'
       }
-    }), wx.showShareMenu({
+    })
+
+    wx.showShareMenu({
       withShareTicket: true
     })
   },
-  defaultShareParamsInit: function (e, t, n) {
+
+  defaultShareParamsInit (e, t, n) {
     const i = this
     console.log('defaultShareParamsInit...', e, t, n)
     this.defaultShareText = e
@@ -372,31 +415,34 @@ cc.Class({
       }
     })
   },
-  sendMggfBehaveReport: function (e, t) {
-    const n = {}
-    n.da_action = e
-    n.da_position = void 0 == this.showId ? 0 : this.showId
-    n.da_type = t
-    n.game_id = facade.GameId
-    n.user_id = window.facade.getComponent('PlayerModel').privateUid
-    n.time = Math.floor((new Date()).getTime() / 1e3)
-    const i = this.getMggfSign(n)
-    n.sign = i
-    const o = window.facade.httpServerAdress + 'log/collectorDa'
-    const a = new XMLHttpRequest()
-    a.onreadystatechange = function (e) {}
-    a.onerror = function (e) {}
-    a.open('POST', o, false)
-    a.send(n)
+
+  sendMggfBehaveReport (e, t) {
+    const data = {}
+    data.da_action = e
+    data.da_position = void 0 == this.showId ? 0 : this.showId
+    data.da_type = t
+    data.game_id = facade.GameId
+    data.user_id = window.facade.getComponent('PlayerModel').privateUid
+    data.time = Math.floor((new Date()).getTime() / 1e3)
+    data.sign = this.getMggfSign(data)
+    const path = window.facade.httpServerAdress + 'log/collectorDa'
+
+    const request = new XMLHttpRequest()
+    request.onreadystatechange = function (e) {}
+    request.onerror = function (e) {}
+    request.open('POST', path, false)
+    request.send(data)
   },
-  getMggfSign: function (e) {
+
+  getMggfSign (e) {
     const t = 'da_action=' + e.da_action + '&da_position=' + e.da_position + '&da_type=' + e.da_type + '&game_id=' + e.game_id + '&time=' + e.time + '&user_id=' + e.user_id + '|' + facade.Client_Secret
     console.log('lc getMggfSign =', t, cc.md5Encode(t).toLowerCase())
     return cc.md5Encode(t).toLowerCase()
   },
-  onWxShow: function () {},
-  onWxHide: function () {},
-  onShowInterstital: function () {
+
+  onWxShow () {},
+  onWxHide () {},
+  onShowInterstital () {
     const e = {
       inviteId: 0,
       videoId: 0,

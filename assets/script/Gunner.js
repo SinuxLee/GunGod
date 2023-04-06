@@ -72,20 +72,20 @@ cc.Class({
       const n = this.gunDir.signAngle(cc.v2(1, 0))
       this.handGun.angle = -n / Math.PI * 180
 
-      if(this.aim) {
+      if (this.aim) {
         this.aim.active = true, this.aim.x = this.gunDir.mag()
       }
     }
   },
 
   onTouchEnd (event) {
-    if(this.isInUI) this.createAbullet()
+    if (this.isInUI) this.createAbullet()
     else {
-      if(this.aim) this.aim.active = false
-      if(!window.facade.getComponent('Facade').levelPassed) {
-        if(facade.getComponent('LevelModel').shotedBullets >= facade.getComponent('LevelModel').bulletFilled) {
-          window.audio.getComponent('SoundManager').playEffect('empty') 
-        }else {
+      if (this.aim) this.aim.active = false
+      if (!window.facade.getComponent('Facade').levelPassed) {
+        if (facade.getComponent('LevelModel').shotedBullets >= facade.getComponent('LevelModel').bulletFilled) {
+          window.audio.getComponent('SoundManager').playEffect('empty')
+        } else {
           this.createAbullet()
           window.facade.getComponent('LevelModel').shotABullet()
         }

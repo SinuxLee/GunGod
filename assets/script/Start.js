@@ -13,13 +13,16 @@ cc.Class({
     texturemanager: cc.Node,
     guidemanager: cc.Node
   },
-  onLoad: function () {
+
+  onLoad () {
     GameConfig.PLATFORM == 'wx' && wx.showLoading({
       title: '游戏加载中',
       mask: true
     })
+
     cc.director.getPhysicsManager().enabled = true
     cc.director.getPhysicsManager().gravity = cc.v2(0, -300)
+
     window.facade = this.facade
     window.audio = this.soundInstance
     window.net = this.net
@@ -28,24 +31,28 @@ cc.Class({
     window.net.platformName = ''
     window.net.checkName = ''
     window.facade.isMiniGame = !(GameConfig.PLATFORM != 'wx')
-    for (const t in this.platformList) {
-      const n = this.platformList[t].split(',')
-      const o = n[0]
-      if (window['' + o] != null) {
-        window.net.platformName = o
-        window.net.checkName = n[1]
+
+    for (const platform in this.platformList) {
+      const arr = this.platformList[platform].split(',')
+      const name = arr[0]
+      if (window['' + name] != null) {
+        window.net.platformName = name
+        window.net.checkName = arr[1]
         console.log('当前平台： ', window.net.platformName)
         break
       }
     }
+
     cc.view.enableRetina(true)
     cc.view.enableAntiAlias(false)
-    window.pool = require('Pool')
+
     cc.game.addPersistRootNode(this.facade)
     cc.game.addPersistRootNode(this.soundInstance)
     cc.game.addPersistRootNode(this.net)
     cc.game.addPersistRootNode(this.popUp)
     cc.game.addPersistRootNode(this.texturemanager)
+
+    window.pool = require('Pool')
     window.facade.addComponent('GameModel')
     window.facade.addComponent('LevelModel')
     window.facade.addComponent('PlayerModel')
@@ -57,24 +64,27 @@ cc.Class({
     window.facade.addComponent('InterstitialADModel')
     this.doStart()
   },
-  doStart: function () {
+
+  doStart () {
     cc.director.setClearColor((new cc.Color()).fromHEX('#758F89'))
     this.initModules()
-    const e = cc.sequence(cc.fadeOut(0.05), cc.callFunc(this.gogame.bind(this)))
-    this.node.runAction(e)
+
+    this.node.runAction(cc.sequence(cc.fadeOut(0.05), cc.callFunc(this.gogame.bind(this))))
   },
-  gogame: function () {
+
+  gogame () {
     const t = require('ModuleEventEnum')
     cc.systemEvent.emit(t.GO_GAME)
   },
-  initModules: function () {
+
+  initModules () {
     window.facade.modules = {}
-    const t = require('MConfig')
-    for (const n in t) {
-      const i = t[n].key
-      const o = require(i)
-      o.init()
-      window.facade.modules[i] = o
+    const config = require('MConfig')
+    for (const item in config) {
+      const name = config[item].key
+      const module = require(name)
+      module.init()
+      window.facade.modules[name] = module
     }
   }
 })

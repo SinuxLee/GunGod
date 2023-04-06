@@ -1,7 +1,7 @@
 cc.Class({
   extends: cc.Component,
 
-  update: function (e) {
+  update (e) {
     this.node.angle++
   }
 })

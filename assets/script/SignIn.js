@@ -12,87 +12,119 @@ cc.Class({
     doubleBtn: cc.Node,
     normalBtn: cc.Node
   },
-  onLoad: function () {
+
+  onLoad () {
     this.closeActTime = 0.18
     this.normalBtn.scale = 1
   },
-  viewDidAppear: function () {
+
+  viewDidAppear () {
     this.content.active = true
     this.initContent()
     this.setupShare()
     require('VirBannerCtrl').hideVirBanner()
   },
-  initContent: function () {
-    const e = facade.getComponent('GameModel').getRewardConfig()
-    console.log('config: ', e)
-    let t
-    let n = facade.getComponent('GameModel').fetchDays
-    let i = Math.floor(facade.getComponent('GameModel').lastFetchSignInTime / 86400 / 1e3)
-    const o = Math.floor(facade.getComponent('GameModel').getLocalTime() / 86400 / 1e3)
-    n == null && (n = 0), i == null && (i = 0), i >= o && (this.doubleBtn.active = false, this.normalBtn.active = false), n == 0 ? (this.title.string = '第1天', t = 1) : (t = n % 7 == 0 ? 7 : n % 7, i < o && (t = t == 7 ? 1 : t + 1), this.title.string = '第' + t + '天'), t == 7 && (o > i ? (this.sDayNow.active = true, this.sDayIsGet.active = false) : (this.sDayNow.active = false, this.sDayIsGet.active = true)), this.doubleBtn.active = o > i, this.normalBtn.active = o > i
-    for (let a = 0; a < e.length - 1; a++) {
-      const s = cc.instantiate(this.item)
-      s.getComponent('SigninItem').initData(e[a], t)
-      s.parent = this.content
-      s.opacity = 0
-      s.scaleY = 0
+
+  initContent () {
+    const config = facade.getComponent('GameModel').getRewardConfig()
+    console.log('config: ', config)
+
+    let dayIdx = 0
+    let days = facade.getComponent('GameModel').fetchDays
+    let lastFetch = Math.floor(facade.getComponent('GameModel').lastFetchSignInTime / 86400 / 1e3)
+    const now = Math.floor(facade.getComponent('GameModel').getLocalTime() / 86400 / 1e3)
+    days == null && (days = 0)
+    lastFetch == null && (lastFetch = 0)
+    lastFetch >= now && (this.doubleBtn.active = false, this.normalBtn.active = false)
+
+    days == 0 ? (this.title.string = '第1天', dayIdx = 1) : (dayIdx = days % 7 == 0 ? 7 : days % 7, lastFetch < now && (dayIdx = dayIdx == 7 ? 1 : dayIdx + 1), this.title.string = '第' + dayIdx + '天')
+    dayIdx == 7 && (now > lastFetch ? (this.sDayNow.active = true, this.sDayIsGet.active = false) : (this.sDayNow.active = false, this.sDayIsGet.active = true))
+
+    this.doubleBtn.active = now > lastFetch
+    this.normalBtn.active = now > lastFetch
+
+    for (let a = 0; a < config.length - 1; a++) {
+      const node = cc.instantiate(this.item)
+      node.getComponent('SigninItem').initData(config[a], dayIdx)
+      node.parent = this.content
+      node.opacity = 0
+      node.scaleY = 0
     }
-    this.sDayNum.string = 'x' + e[e.length - 1].AwardNum
-    let c = ''
-    switch (e[e.length - 1].AwardType) {
+    this.sDayNum.string = 'x' + config[config.length - 1].AwardNum
+
+    let rewardName = ''
+    switch (config[config.length - 1].AwardType) {
       case 1:
-        c = 'cash'
+        rewardName = 'cash'
         break
       case 2:
-        c = 'strength'
+        rewardName = 'strength'
         break
       case 3:
-        c = 'video'
+        rewardName = 'video'
         this.sDayNum.node.active = false
         break
       case 4:
-        c = 'skin'
+        rewardName = 'skin'
         this.sDayNum.node.active = false
         cc.loader.loadRes('roles', cc.SpriteAtlas, this.updateSkin.bind(this))
     }
-    this.sDayImg.getChildByName(c).active = true
-    this.reward = e[t - 1]
-    this.sDayReward = e[6]
+
+    this.sDayImg.getChildByName(rewardName).active = true
+    this.reward = config[dayIdx - 1]
+    this.sDayReward = config[6]
     this.doAction()
   },
-  doAction: function () {
+
+  doAction () {
     this.title.node.runAction(cc.moveBy(0.3, cc.v2(-500, 0)).easing(cc.easeInOut(3)))
     this.uiName.runAction(cc.moveBy(0.3, cc.v2(500, 0)).easing(cc.easeInOut(3)))
 
-    const e = cc.spawn(cc.fadeIn(0.3), cc.scaleTo(0.3, 1).easing(cc.easeIn(3)))
-    const t = cc.spawn(cc.fadeIn(0.3), cc.scaleTo(0.3, 1).easing(cc.easeIn(3)))
-    const n = []; const i = []; const o = this.content.children
-    for (let a = 0; a < o.length; a++) a < 3 ? n.push(o[a]) : i.push(o[a])
-    this.count = 1, this.actId = setInterval(function () {
-      if (this.count != 4) {
-        if (this.count == 3) return this.sDayIsGet.parent.runAction(e.clone()), void this.count++
-        const t = this.count == 2 ? i : n
-        for (const o in t) t[o].runAction(e.clone())
+    const action1 = cc.spawn(cc.fadeIn(0.3), cc.scaleTo(0.3, 1).easing(cc.easeIn(3)))
+    const action2 = cc.spawn(cc.fadeIn(0.3), cc.scaleTo(0.3, 1).easing(cc.easeIn(3)))
+
+    const arr1 = []
+    const arr2 = []
+    const childNodes = this.content.children
+
+    for (let a = 0; a < childNodes.length; a++) a < 3 ? arr1.push(childNodes[a]) : arr2.push(childNodes[a])
+
+    this.count = 1
+    this.actId = setInterval(function () {
+      if (this.count == 4) return clearInterval(this.actId)
+
+      if (this.count == 3) {
+        this.sDayIsGet.parent.runAction(action1.clone())
         this.count++
-      } else clearInterval(this.actId)
+        return
+      }
+
+      const t = this.count == 2 ? arr2 : arr1
+      for (const o in t) t[o].runAction(action1.clone())
+      this.count++
     }.bind(this), 250)
-    this.doubleBtn.runAction(t)
+
+    this.doubleBtn.runAction(action2)
     this.normalBtn.opacity = 255
   },
-  setupShare: function () {
-    facade.getComponent('ShareADModel').getShareADType() != 2 ? this.doubleBtn.getChildByName('video').active = true : this.doubleBtn.getChildByName('share').active = true
+
+  setupShare () {
+    if (facade.getComponent('ShareADModel').getShareADType() != 2) this.doubleBtn.getChildByName('video').active = true
+    else this.doubleBtn.getChildByName('share').active = true
   },
-  updateSkin: function (e, t) {
-    if (e) console.error(e)
-    else {
-      const n = t.getSpriteFrame('MrBullet_Role_Body_0' + this.sDayReward.AwardNum)
-      this.sDayImg.getChildByName('skin').getChildByName('head').getComponent(cc.Sprite).spriteFrame = n
-    }
+
+  updateSkin (err, t) {
+    if (err) return console.error(err)
+
+    const n = t.getSpriteFrame('MrBullet_Role_Body_0' + this.sDayReward.AwardNum)
+    this.sDayImg.getChildByName('skin').getChildByName('head').getComponent(cc.Sprite).spriteFrame = n
   },
-  onClickNormalGet: function () {
+
+  onClickNormalGet () {
     facade.getComponent('GameModel').applySignReward(false, this.reward)
   },
-  onClickDoubleGet: function () {
+
+  onClickDoubleGet () {
     const e = this
     const t = {
       inviteId: 1531,
@@ -111,14 +143,20 @@ cc.Class({
       }
     })
   },
-  onClickClose: function () {
+
+  onClickClose () {
     popUp.getComponent('Pop').removeTop()
   },
-  doClose: function () {
-    const e = cc.scaleTo(0.2, 1.4)
-    this.sDayIsGet.parent.runAction(e.clone())
-    const t = this.content.children
-    for (const n in t) t[n].runAction(e.clone())
-    this.doubleBtn.runAction(e.clone()), this.title.node.runAction(e.clone()), this.uiName.runAction(e.clone())
+
+  doClose () {
+    const action = cc.scaleTo(0.2, 1.4)
+    this.sDayIsGet.parent.runAction(action.clone())
+
+    const child = this.content.children
+    for (const n in child) child[n].runAction(action.clone())
+
+    this.doubleBtn.runAction(action.clone())
+    this.title.node.runAction(action.clone())
+    this.uiName.runAction(action.clone())
   }
 })

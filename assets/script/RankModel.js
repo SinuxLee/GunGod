@@ -6,11 +6,13 @@ cc.Class({
   onLoad: function () {
     cc.systemEvent.on(ModuleEventEnum.GOT_HTTP_RES, this.httpResDeal.bind(this))
   },
-  httpResDeal: function (e) {
-    const t = e.data
+
+  httpResDeal (res) {
+    const t = res.data
     t && t.nick_name ? (this.selfdata = t, cc.systemEvent.emit(ModuleEventEnum.PLAYER_RANK_DATA, this.selfdata)) : t && t[0] && t[0].best_score ? (this.ranks = t, cc.systemEvent.emit(ModuleEventEnum.RANK_LIST, this.ranks)) : t && t[0] && t[0].today_best_score && (this.ranks = t, cc.systemEvent.emit(ModuleEventEnum.RANK_LIST, this.ranks))
   },
-  requestRankList: function (e) {
+
+  requestRankList (e) {
     let t = 1
     e == 2 ? t = 3 : e == 1 && (t = 1)
     const n = {
@@ -24,7 +26,8 @@ cc.Class({
     }
     window.net.getComponent('Net').httpRequest(window.net.RankList, n)
   },
-  requestSelfRank: function (e) {
+
+  requestSelfRank (e) {
     let t = 1
     e == 2 ? t = 3 : e == 1 && (t = 1)
     const n = {

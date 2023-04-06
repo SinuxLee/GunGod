@@ -4,20 +4,28 @@ cc.Class({
     recommendPre: cc.Prefab
   },
 
-  onEnable: function () {
-    net.platformName != 'qq' ? cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4 : facade.getComponent('BannerModel').showBanner()
+  onEnable () {
+    if (net.platformName != 'qq') cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1e4
+    else facade.getComponent('BannerModel').showBanner()
   },
 
-  init: function () {
+  init () {
     this.inited = true
   },
-  onClose: function () {
+
+  onClose () {
     cc.director.getScene().getChildByName('Canvas').getComponent('MainUI').hideSkinPanel()
   },
-  onDisable: function () {
-    this.inited = false, net.platformName != 'qq' ? (cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1, cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = true) : facade.getComponent('BannerModel').hideBanner()
+
+  onDisable () {
+    this.inited = false
+    if (net.platformName != 'qq') {
+      cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').zIndex = 1
+      cc.director.getScene().getChildByName('Canvas').getChildByName('recommendBar').active = true
+    } else facade.getComponent('BannerModel').hideBanner()
   },
-  update: function (e) {
+
+  update (e) {
     this.node.active && !this.inited && this.init()
   }
 })

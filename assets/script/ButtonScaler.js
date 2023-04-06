@@ -16,11 +16,11 @@ cc.Class({
     this.node.on('touchcancel', this.touchEnd, this)
   },
 
-  touchStart(){
-    if(this.node.getComponent(cc.Button).interactable != 0) {
+  touchStart () {
+    if (this.node.getComponent(cc.Button).interactable != 0) {
       window.audio.getComponent('SoundManager').playEffect('click')
 
-      if(this.pressedScale != 1) {
+      if (this.pressedScale != 1) {
         this.node.stopAllActions()
         this.node.runAction(this.scaleDownAction)
       }
@@ -28,7 +28,7 @@ cc.Class({
   },
 
   touchEnd () {
-    if(this.node.getComponent(cc.Button).interactable != 0 && this.pressedScale != 1) {
+    if (this.node.getComponent(cc.Button).interactable != 0 && this.pressedScale != 1) {
       this.node.stopAllActions()
       this.node.runAction(this.scaleUpAction)
     }
