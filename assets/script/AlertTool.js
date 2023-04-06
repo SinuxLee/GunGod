@@ -1,7 +1,5 @@
-const t = module
-
-const i = {
-  showMessage: function (e) {
+module.exports = {
+  showMessage (e) {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.showToast({
       title: e,
       icon: 'none',
@@ -9,7 +7,8 @@ const i = {
       duration: 2e3
     })
   },
-  showSuccess: function (e) {
+
+  showSuccess (e) {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.showToast({
       title: e,
       icon: 'success',
@@ -17,19 +16,23 @@ const i = {
       duration: 2e3
     })
   },
-  hideToast: function () {
+
+  hideToast () {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.hideToast()
   },
-  showLoading: function (e, t) {
+
+  showLoading (e, t) {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.showLoading({
       title: e,
       mask: t
     })
   },
-  hideLoading: function () {
+
+  hideLoading () {
     cc.sys.platform == cc.sys.WECHAT_GAME && wx.hideLoading()
   },
-  showConfirmModal: function (e, t, n) {
+
+  showConfirmModal (e, t, n) {
     wx.showModal({
       title: e,
       content: t,
@@ -38,7 +41,8 @@ const i = {
       }
     })
   },
-  showModal: function (e, t, n, i) {
+
+  showModal (e, t, n, i) {
     cc.sys.platform == cc.sys.WECHAT_GAME
       ? wx.showModal({
         title: '提示',
@@ -54,4 +58,3 @@ const i = {
       : i.cancel()
   }
 }
-t.exports = i

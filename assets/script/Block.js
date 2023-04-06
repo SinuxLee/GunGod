@@ -3,17 +3,24 @@ const ModuleEventEnum = require('ModuleEventEnum')
 cc.Class({
   extends: cc.Component,
 
-  onBeginContact: function (e, t, n) {
-    t.node.group == 'prop' && n.node.group == 'body' && (cc.v2(t.body._b2Body.m_linearVelocity.x - n.body._b2Body.m_linearVelocity.x, t.body._b2Body.m_linearVelocity.y - -n.body._b2Body.m_linearVelocity.y).mag() > 2 && this.killSuffer(n.node))
+  onBeginContact (contact, self, other) {
+    if(self.node.group == 'prop' && other.node.group == 'body') {
+      const x = self.body._b2Body.m_linearVelocity.x - other.body._b2Body.m_linearVelocity.x
+      const y = self.body._b2Body.m_linearVelocity.y - -other.body._b2Body.m_linearVelocity.y
+
+      if(cc.v2(x, y).mag() > 2) this.killSuffer(other.node)
+    }
   },
 
-  killSuffer: function (e) {
-    if (!this.suffer || this.suffer != e.parent) {
-      this.suffer = e.parent
-      const t = cc.instantiate(this.suffer.getChildByName('blood'))
-      t.active = true
-      t.getComponent(cc.ParticleSystem).resetSystem()
-      t.parent = e
+  killSuffer (node) {
+    if (!this.suffer || this.suffer != node.parent) {
+      this.suffer = node.parent
+      
+      const blood = cc.instantiate(this.suffer.getChildByName('blood'))
+      blood.active = true
+      blood.getComponent(cc.ParticleSystem).resetSystem()
+      blood.parent = node
+
       cc.systemEvent.emit(ModuleEventEnum.KILLED, this.suffer.name)
     }
   }

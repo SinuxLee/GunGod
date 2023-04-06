@@ -6,57 +6,70 @@ cc.Class({
     boomPre: cc.Prefab
   },
 
-  onBeginContact: function (e, t, n) {
-    if (t.node.group == 'boom' && n.node.group == 'bullet') this.explosive()
-    else if (t.node.group == 'boom' && n.node.group == 'body') {
-      cc.v2(t.body._b2Body.m_linearVelocity.x - n.body._b2Body.m_linearVelocity.x, t.body._b2Body.m_linearVelocity.y - -n.body._b2Body.m_linearVelocity.y).mag() > 2 && this.explosive()
-    } else if (t.node.group == 'boom' && n.node.group == 'boom') {
-      cc.v2(t.body._b2Body.m_linearVelocity.x - n.body._b2Body.m_linearVelocity.x, t.body._b2Body.m_linearVelocity.y - -n.body._b2Body.m_linearVelocity.y).mag() > 2 && this.explosive()
+  onBeginContact (contact, self, other) {
+    if(self.node.group != 'boom') return
+    switch(other.node.group){
+      case 'bullet':
+        this.explosive()
+        break
+      case 'body':
+      case 'boom':
+        const x = self.body._b2Body.m_linearVelocity.x - other.body._b2Body.m_linearVelocity.x
+        const y = self.body._b2Body.m_linearVelocity.y - -other.body._b2Body.m_linearVelocity.y
+        if(cc.v2(x, y).mag() > 2) this.explosive()
+        break
     }
   },
 
-  explosive: function () {
+  // 爆炸物
+  explosive () {
     this.expolosiveAnimate()
     this.findSuffer()
     this.node.removeFromParent()
     window.audio.getComponent('SoundManager').playEffect('bomb')
   },
 
-  findSuffer: function () {
-    const e = window.facade.selectedLevelType
-    let t = 'other'
-    e == 'vip' && (t = 'vip'), e == 'injury' && (t = 'role')
-    for (let n = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').getChildren(), i = this.node.position, o = 0; o < n.length; o++) {
-      if (n[o].name.match('suffer') || n[o].name.match(t)) {
-        if (n[o].position.sub(i).mag() < 2 * this.node.width) {
-          const a = n[o]
-          this.killSuffer(a)
+  findSuffer () {
+    const levelType = window.facade.selectedLevelType
+    let newType = 'other'
+    levelType == 'vip' && (newType = 'vip')
+    levelType == 'injury' && (newType = 'role')
+
+    let nodes = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').getChildren()
+    let pos = this.node.position
+
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].name.match('suffer') || nodes[i].name.match(newType)) {
+        if (nodes[i].position.sub(pos).mag() < 2 * this.node.width) {
+          this.killSuffer(nodes[i])
         }
       }
     }
   },
 
-  killSuffer: function (e) {
-    for (let t = e.position.sub(this.node.position).normalizeSelf(), n = 0; n < e.getChildren().length; n++) {
-      const o = e.getChildren()[n]
-      const a = o.getComponent(cc.RigidBody)
-      if (o.group == 'body' && a) {
-        const s = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(o.convertToWorldSpaceAR(cc.v2()))
-        a.applyLinearImpulse(t.mulSelf(1.8), s)
-        const c = cc.instantiate(e.getChildByName('blood'))
-        c.active = true
-        c.getComponent(cc.ParticleSystem).resetSystem()
-        c.parent = o
+  killSuffer (node) {
+    let vec = node.position.sub(this.node.position).normalizeSelf()
+    for (let i = 0; i < node.getChildren().length; i++) {
+      const childNode = node.getChildren()[i]
+      const rigidBody = childNode.getComponent(cc.RigidBody)
+      if (childNode.group == 'body' && rigidBody) {
+        const point = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(childNode.convertToWorldSpaceAR(cc.v2()))
+        rigidBody.applyLinearImpulse(vec.mulSelf(1.8), point)
+        
+        const blood = cc.instantiate(node.getChildByName('blood'))
+        blood.active = true
+        blood.getComponent(cc.ParticleSystem).resetSystem()
+        blood.parent = childNode
       }
     }
-    cc.systemEvent.emit(ModuleEventEnum.KILLED, e.name)
+    cc.systemEvent.emit(ModuleEventEnum.KILLED, node.name)
   },
 
-  expolosiveAnimate: function () {
-    const e = cc.instantiate(this.boomPre)
-    e.position = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(this.node.convertToWorldSpaceAR(cc.v2()))
-    e.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
-    e.getComponent(cc.ParticleSystem).resetSystem()
-    cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').addChild(e)
+  expolosiveAnimate () {
+    const boomNode = cc.instantiate(this.boomPre)
+    boomNode.position = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(this.node.convertToWorldSpaceAR(cc.v2()))
+    boomNode.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
+    boomNode.getComponent(cc.ParticleSystem).resetSystem()
+    cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').addChild(boomNode)
   }
 })

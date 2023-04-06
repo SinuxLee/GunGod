@@ -6,70 +6,98 @@ cc.Class({
     crateBoomPre: cc.Prefab
   },
 
-  onLoad: function () {
+  onLoad () {
     this._first = true
     this._kills = {}
     this.frameCount = 0
     this.reflectCount = 0
   },
 
-  start: function () {
-    this.node.master.match('suffer') && (this.node.getChildByName('tail').getComponent(cc.MotionStreak).color = cc.color(255, 255, 255))
+  start () {
+    if(this.node.master.match('suffer')) {
+      // 拖尾效果
+      this.node.getChildByName('tail').getComponent(cc.MotionStreak).color = cc.color(255, 255, 255)
+    }
   },
 
-  onBeginContact: function (e, t, n) {
-    if (t.node.group == 'bullet' && n.node.group == 'body') {
-      if (this._kills[n.node.parent.name]);
-      else {
-        if (this.reflectCount <= 0 && n.node.parent.name == 'role') return
-        this._hitman = n.node.parent
+  onBeginContact (contact, self, other) {
+    if (self.node.group == 'bullet' && other.node.group == 'body') {
+      if (this._kills[other.node.parent.name] == null){
+        if (this.reflectCount <= 0 && other.node.parent.name == 'role') return
+        this._hitman = other.node.parent
         this.hit = true
         this.out = false
 
         if (this._hitman && this._hitman.getChildByName('blood')) {
-          const o = cc.instantiate(this._hitman.getChildByName('blood'))
-          o.active = true
-          o.getComponent(cc.ParticleSystem).resetSystem()
-          o.parent = n.node
+          const blood = cc.instantiate(this._hitman.getChildByName('blood'))
+          blood.active = true
+          blood.getComponent(cc.ParticleSystem).resetSystem()
+          blood.parent = other.node
         }
       }
-      this._kills[n.node.parent.name] = true
-      cc.systemEvent.emit(ModuleEventEnum.KILLED, n.node.parent.name)
+      this._kills[other.node.parent.name] = true
+      cc.systemEvent.emit(ModuleEventEnum.KILLED, other.node.parent.name)
       return
     }
-    if (t.node.group == 'bullet' && this._first && (n.node.group == 'border' || n.node.group == 'prop')) {
-      const a = cc.instantiate(cc.director.getScene().getChildByName('Canvas').getChildByName('hitEarth'))
-      a.position = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(t.node.convertToWorldSpaceAR(cc.v2()))
-      a.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
-      a.getComponent(cc.ParticleSystem).resetSystem()
-      cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').addChild(a)
+
+    if (self.node.group == 'bullet' && this._first && 
+      (other.node.group == 'border' || other.node.group == 'prop')) {
+      const hitEarth = cc.instantiate(cc.director.getScene().getChildByName('Canvas').getChildByName('hitEarth'))
+      const levelPlay = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay')
+      
+      hitEarth.position = levelPlay.convertToNodeSpaceAR(self.node.convertToWorldSpaceAR(cc.v2()))
+      hitEarth.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
+      hitEarth.getComponent(cc.ParticleSystem).resetSystem()
+      levelPlay.addChild(hitEarth)
       this._first = false
     }
+
     this.reflectCount++
     window.audio.getComponent('SoundManager').playEffect('reflect')
-    this.reflectCount > 20 && (window.facade.getComponent('LevelModel').useABullet(), this.node.removeFromParent())
-  },
 
-  onPreSolve: function (e, t, n) {
-    if (t.node.group == 'bullet' && n.node.group == 'body') return this.out ? void (e.disabled = true) : (e.disabled = true, void n.node.getComponent(cc.RigidBody).applyForceToCenter(cc.v2(1e4, 1e4)))
-    if (t.body.isCross = false, t.node.group == 'bullet' && n.node.group == 'box') {
-      const i = cc.instantiate(this.crateBoomPre)
-      i.position = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').convertToNodeSpaceAR(n.node.convertToWorldSpaceAR(cc.v2()))
-      i.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
-      i.getComponent(cc.ParticleSystem).resetSystem()
-      cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay').addChild(i)
-      n.node.removeFromParent()
+    if(this.reflectCount > 20) {
+      window.facade.getComponent('LevelModel').useABullet()
+      this.node.removeFromParent()
     }
   },
 
-  onPostSolve: function (e, t, n) {
-    t.node.group == 'bullet' && n.node.group == 'body' && (e.disabled = true, this.out = true)
-    t.body.isCross = false
+  onPreSolve (contact, self, other) {
+    if (self.node.group == 'bullet' && other.node.group == 'body') {
+      contact.disabled = true
+      if(!this.out){
+        other.node.getComponent(cc.RigidBody).applyForceToCenter(cc.v2(10000, 10000))
+      }
+      return
+    }
+    
+    self.body.isCross = false
+    if (self.node.group == 'bullet' && other.node.group == 'box') {
+      const crateBoom = cc.instantiate(this.crateBoomPre)
+      const levelPlay = cc.director.getScene().getChildByName('Canvas').getChildByName('levelPlay')
+
+      crateBoom.position = levelPlay.convertToNodeSpaceAR(other.node.convertToWorldSpaceAR(cc.v2()))
+      crateBoom.getComponent(cc.ParticleSystem).autoRemoveOnFinish = true
+      crateBoom.getComponent(cc.ParticleSystem).resetSystem()
+      levelPlay.addChild(crateBoom)
+      other.node.removeFromParent()
+    }
   },
 
-  update: function (e) {
+  onPostSolve (contact, self, other) {
+    if(self.node.group == 'bullet' && other.node.group == 'body'){
+      contact.disabled = true
+      this.out = true
+    }
+    self.body.isCross = false
+  },
+
+  update (dt) {
     this.frameCount++
-    const t = this.node.convertToWorldSpaceAR(cc.v2());
-    (t.x < -500 || t.x > 1300 || t.y <= -500 || t.y > 2e3) && (window.facade.getComponent('LevelModel').useABullet(), this.node.removeFromParent())
+    const worldPos = this.node.convertToWorldSpaceAR(cc.v2());
+    if(worldPos.x < -500 || worldPos.x > 1300 || 
+      worldPos.y <= -500 || worldPos.y > 2000) {
+      window.facade.getComponent('LevelModel').useABullet()
+      this.node.removeFromParent()
+    }
   }
 })

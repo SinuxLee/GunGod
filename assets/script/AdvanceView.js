@@ -23,23 +23,24 @@ cc.Class({
     window.facade.getComponent('GameModel').passLevelCount = 0
   },
 
-  takeAward: function () {
-    const e = {
+  takeAward() {
+    const data = {
       inviteId: 1536,
       videoId: 21108,
       assistId: 0,
       interstitalId: 31110
     }
-    window.facade.getComponent('ShareADModel').showShareAD(e, {
+    window.facade.getComponent('ShareADModel').showShareAD(data, {
       succ: function (e) {
         this.takeAwardSuccess()
       }.bind(this),
-      fail: function (e, t) {
-        popUp.getComponent('FloatTip').showTip(e)
+      fail: function (err, t) {
+        popUp.getComponent('FloatTip').showTip(err)
       }
     })
   },
-  takeAwardSuccess: function () {
+
+  takeAwardSuccess() {
     window.facade.getComponent('GameModel').takeAdvanceReward()
     window.facade.getComponent('GameModel').newerRewardCancelCount--
     popUp.getComponent('Pop').removeTop()

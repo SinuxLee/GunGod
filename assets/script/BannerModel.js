@@ -16,7 +16,10 @@ cc.Class({
   },
 
   initBanner: function () {
-    if (window.facade.bannerWidth = 300, window.facade.bannerHeight = 226, facade.isMiniGame) {
+    window.facade.bannerWidth = 300
+    window.facade.bannerHeight = 226
+
+    if (facade.isMiniGame) {
       facade.Screenratio && 1 / facade.Screenratio > 2.06 && (window.facade.bannerHeight = 290), this.leftSize = 0, window.facade.windowWidth > window.facade.bannerWidth && (this.leftSize = (window.facade.windowWidth - window.facade.bannerWidth) / 2)
       const e = this
       let t = {}
@@ -46,11 +49,20 @@ cc.Class({
         case 'tt':
           t = {}
       }
-      return this.bannerAd = wx.createBannerAd(t), this.bannerAd.onLoad(function () {}), this.bannerAd.onError(function (t) {
+
+      this.bannerAd = wx.createBannerAd(t)
+      this.bannerAd.onLoad(function () {})
+      this.bannerAd.onError(function (t) {
         e.bannerAd = null
-      }), this.bannerAd.onResize(function (t) {
-        e.bannerHeight = t.height, facade.Screenratio && 1 / facade.Screenratio > 2.06 ? window.facade.bannerHeight = 2 * (t.height + 15 + 20) + 30 : window.facade.bannerHeight = 2 * (t.height + 20), this.rePosBanner()
-      }.bind(this)), this.bannerAd
+      })
+      
+      this.bannerAd.onResize(function (t) {
+        e.bannerHeight = t.height
+        facade.Screenratio && 1 / facade.Screenratio > 2.06 ? window.facade.bannerHeight = 2 * (t.height + 15 + 20) + 30 : window.facade.bannerHeight = 2 * (t.height + 20)
+        this.rePosBanner()
+      }.bind(this))
+
+      return this.bannerAd
     }
   },
   showBanner: function (e) {

@@ -10,7 +10,7 @@ cc.Class({
     isSuffer: false
   },
 
-  onLoad: function () {
+  onLoad () {
     if (this.isInUI || this.isSuffer) return
 
     this.aim = new cc.Node()
@@ -22,71 +22,86 @@ cc.Class({
     this.aim.y = 10
   },
 
-  start: function () {
+  start () {
     this.node.parent.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
     this.node.parent.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this)
     this.node.parent.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this)
     this.node.parent.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this)
   },
 
-  onEnable: function () {
+  onEnable () {
     this.node.parent.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
     this.node.parent.on(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this)
     this.node.parent.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this)
     this.node.parent.on(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this)
   },
 
-  onDisable: function () {
+  onDisable () {
     this.node.parent.off(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
     this.node.parent.off(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this)
     this.node.parent.off(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this)
     this.node.parent.off(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this)
   },
 
-  onDestroy: function () {
+  onDestroy () {
     this.node.parent.off(cc.Node.EventType.TOUCH_START, this.onTouchStart, this)
     this.node.parent.off(cc.Node.EventType.TOUCH_MOVE, this.onTouchMove, this)
     this.node.parent.off(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this)
     this.node.parent.off(cc.Node.EventType.TOUCH_CANCEL, this.onTouchCancel, this)
   },
 
-  onTouchStart: function (e) {
-    const t = e.getLocation()
+  onTouchStart (event) {
+    const touchPos = event.getLocation()
     this._inTouch = true
     if (!this.isInUI) {
       this.line.active = true
       this.line.runAction(cc.repeatForever(cc.sequence(cc.fadeIn(0.5), cc.fadeOut(0.5))))
     }
     this.gunPos = this.handGun.convertToWorldSpaceAR(cc.v2())
-    this.gunDir = t.sub(this.gunPos)
+    this.gunDir = touchPos.sub(this.gunPos)
 
     const n = this.gunDir.signAngle(cc.v2(1, 0))
     this.handGun.angle = -n / Math.PI * 180
   },
 
-  onTouchMove: function (e) {
-    const t = e.getLocation()
+  onTouchMove (event) {
+    const touchPos = event.getLocation()
     if (this._inTouch) {
       this.gunPos = this.handGun.convertToWorldSpaceAR(cc.v2())
-      this.gunDir = t.sub(this.gunPos)
+      this.gunDir = touchPos.sub(this.gunPos)
       const n = this.gunDir.signAngle(cc.v2(1, 0))
       this.handGun.angle = -n / Math.PI * 180
-      this.aim && (this.aim.active = true, this.aim.x = this.gunDir.mag())
+
+      if(this.aim) {
+        this.aim.active = true, this.aim.x = this.gunDir.mag()
+      }
     }
   },
 
-  onTouchEnd: function (e) {
-    this.isInUI ? this.createAbullet() : (this.aim && (this.aim.active = false), window.facade.getComponent('Facade').levelPassed || (facade.getComponent('LevelModel').shotedBullets >= facade.getComponent('LevelModel').bulletFilled ? window.audio.getComponent('SoundManager').playEffect('empty') : (this.createAbullet(), window.facade.getComponent('LevelModel').shotABullet())))
+  onTouchEnd (event) {
+    if(this.isInUI) this.createAbullet()
+    else {
+      if(this.aim) this.aim.active = false
+      if(!window.facade.getComponent('Facade').levelPassed) {
+        if(facade.getComponent('LevelModel').shotedBullets >= facade.getComponent('LevelModel').bulletFilled) {
+          window.audio.getComponent('SoundManager').playEffect('empty') 
+        }else {
+          this.createAbullet()
+          window.facade.getComponent('LevelModel').shotABullet()
+        }
+      }
+    }
   },
 
-  createAbullet: function () {
-    const e = cc.instantiate(this.bulletPre)
-    e.position = this.node.parent.convertToNodeSpaceAR(this.muzzel.convertToWorldSpaceAR(cc.v2()))
-    const t = this.gunDir.normalizeSelf()
-    e.getComponent(cc.RigidBody).linearVelocity = t.mulSelf(2e3)
-    e.angle = this.handGun.angle
-    e.master = this.node.name
-    this.node.parent.addChild(e)
+  createAbullet () {
+    const bulletNode = cc.instantiate(this.bulletPre)
+    bulletNode.position = this.node.parent.convertToNodeSpaceAR(this.muzzel.convertToWorldSpaceAR(cc.v2()))
+    const vector = this.gunDir.normalizeSelf()
+    bulletNode.getComponent(cc.RigidBody).linearVelocity = vector.mulSelf(2e3)
+    bulletNode.angle = this.handGun.angle
+    bulletNode.master = this.node.name
+
+    this.node.parent.addChild(bulletNode)
     window.audio.getComponent('SoundManager').playEffect('shoot')
     this._inTouch = false
     this.smoke.resetSystem()
@@ -94,8 +109,7 @@ cc.Class({
     this.line.active = false
   },
 
-  onTouchCancel: function (e) {
-    e.getLocation()
+  onTouchCancel (event) {
     this._inTouch = false
     this.line.stopAllActions()
     this.line.active = false
